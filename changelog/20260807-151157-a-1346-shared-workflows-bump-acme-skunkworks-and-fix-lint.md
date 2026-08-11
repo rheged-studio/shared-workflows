@@ -1,14 +1,11 @@
 ---
 title: Bump shared @acme-skunkworks packages and fix markdownlint 3.x fallout
-release_note: >-
-  Raise changelog-core, commitlint-config, and markdownlint-config to their
-  published latest floors, and adapt local markdownlint ignores and first-party
-  docs so the stricter 3.x ruleset stays green.
+release_note: Raise changelog-core, commitlint-config, and markdownlint-config to their published latest floors, and adapt local markdownlint ignores and first-party docs so the stricter 3.x ruleset stays green.
 created_at: "2026-08-07T15:11:57Z"
-merged_at:
+merged_at: "2026-08-11T13:06:54Z"
 branch: a-1346-shared-workflows-bump-acme-skunkworks-and-fix-lint-fallout
-pr:
-commit:
+pr: 106
+commit: ad1bcd6
 author: rob@acmeskunkworks.io
 co_authors: []
 category: fix
@@ -16,9 +13,9 @@ breaking: false
 issues:
   - A-1346
 stats:
-  files_changed:
-  loc_added:
-  loc_removed:
+  files_changed: 8
+  loc_added: 69
+  loc_removed: 27
   commits:
 version:
 ---
