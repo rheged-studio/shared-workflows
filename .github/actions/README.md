@@ -5,7 +5,7 @@ directory here is a composite action (`action.yml`) consumed cross-repo and
 SHA-pinned, e.g.:
 
 ```yaml
-- uses: acme-skunkworks/shared-workflows/.github/actions/setup-project@<sha>
+- uses: rheged-studio/shared-workflows/.github/actions/setup-project@<sha>
 ```
 
 ## Why a separate action layer (ADR 0001 §5.7)

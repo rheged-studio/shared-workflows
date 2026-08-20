@@ -46,7 +46,7 @@ name: Reusable / Validate commits
 #     contents: read
 #   jobs:
 #     commits:
-#       uses: acme-skunkworks/shared-workflows/.github/workflows/reusable-validate-commits.yml@v1
+#       uses: rheged-studio/shared-workflows/.github/workflows/reusable-validate-commits.yml@v1
 
 on:
   workflow_call:
