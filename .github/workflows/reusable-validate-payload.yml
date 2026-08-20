@@ -45,7 +45,7 @@ name: Reusable / Validate fanned payload
 #     contents: read
 #   jobs:
 #     validate-payload:
-#       uses: acme-skunkworks/shared-workflows/.github/workflows/reusable-validate-payload.yml@v1
+#       uses: rheged-studio/shared-workflows/.github/workflows/reusable-validate-payload.yml@v1
 #       with:
 #         skills: true        # this repo is a skills fan-out consumer
 #         coderabbit: true    # this repo is a CodeRabbit-config consumer

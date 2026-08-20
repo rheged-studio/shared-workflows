@@ -58,7 +58,7 @@ name: Reusable / Build & Test
 #     contents: read
 #   jobs:
 #     build-test:
-#       uses: acme-skunkworks/shared-workflows/.github/workflows/reusable-build-test.yml@<sha>
+#       uses: rheged-studio/shared-workflows/.github/workflows/reusable-build-test.yml@<sha>
 
 on:
   workflow_call:
@@ -192,7 +192,7 @@ jobs:
         if: >-
           ${{ inputs.build || inputs.typecheck || inputs.test || inputs.bats ||
           inputs.setup-script != '' }}
-        uses: acme-skunkworks/shared-workflows/.github/actions/setup-project@950537e9b87ebebef89222a8747331d489d17f65 # v1.5.1
+        uses: rheged-studio/shared-workflows/.github/actions/setup-project@950537e9b87ebebef89222a8747331d489d17f65 # v1.5.1
         with:
           node-version-file: ${{ inputs.node-version-file }}
 
@@ -202,33 +202,33 @@ jobs:
 
       - name: 🏗️ Build check
         if: ${{ inputs.build }}
-        uses: acme-skunkworks/shared-workflows/.github/actions/build@950537e9b87ebebef89222a8747331d489d17f65 # v1.5.1
+        uses: rheged-studio/shared-workflows/.github/actions/build@950537e9b87ebebef89222a8747331d489d17f65 # v1.5.1
         with:
           script: ${{ inputs.build-script }}
 
       - name: 🔎 Typecheck
         if: ${{ inputs.typecheck }}
-        uses: acme-skunkworks/shared-workflows/.github/actions/typecheck@950537e9b87ebebef89222a8747331d489d17f65 # v1.5.1
+        uses: rheged-studio/shared-workflows/.github/actions/typecheck@950537e9b87ebebef89222a8747331d489d17f65 # v1.5.1
         with:
           tsconfig: ${{ inputs.tsconfig }}
 
       - name: 🧪 Test (Vitest)
         if: ${{ inputs.test }}
-        uses: acme-skunkworks/shared-workflows/.github/actions/test-vitest@950537e9b87ebebef89222a8747331d489d17f65 # v1.5.1
+        uses: rheged-studio/shared-workflows/.github/actions/test-vitest@950537e9b87ebebef89222a8747331d489d17f65 # v1.5.1
         with:
           args: ${{ inputs.test-args }}
           coverage: ${{ inputs.coverage }}
 
       - name: 🐚 ShellCheck
         if: ${{ inputs.shellcheck }}
-        uses: acme-skunkworks/shared-workflows/.github/actions/shellcheck@950537e9b87ebebef89222a8747331d489d17f65 # v1.5.1
+        uses: rheged-studio/shared-workflows/.github/actions/shellcheck@950537e9b87ebebef89222a8747331d489d17f65 # v1.5.1
         with:
           paths: ${{ inputs.shellcheck-paths }}
           severity: ${{ inputs.shellcheck-severity }}
 
       - name: 🦇 Test (bats)
         if: ${{ inputs.bats }}
-        uses: acme-skunkworks/shared-workflows/.github/actions/test-bats@950537e9b87ebebef89222a8747331d489d17f65 # v1.5.1
+        uses: rheged-studio/shared-workflows/.github/actions/test-bats@950537e9b87ebebef89222a8747331d489d17f65 # v1.5.1
         with:
           paths: ${{ inputs.bats-paths }}
           recursive: ${{ inputs.bats-recursive }}
