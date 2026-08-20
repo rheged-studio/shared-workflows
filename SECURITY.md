@@ -13,7 +13,7 @@ review that signed this surface off is
 ## Reporting a vulnerability
 
 **Do not open a public issue for a security problem.** Report it privately via GitHub's
-[**Report a vulnerability**](https://github.com/acme-skunkworks/shared-workflows/security/advisories/new)
+[**Report a vulnerability**](https://github.com/rheged-studio/shared-workflows/security/advisories/new)
 flow (Security → Advisories), or email the maintainer at <hello@robeasthope.com>. Please
 include the affected workflow/action, a description, and a reproduction or proof-of-concept
 if you have one. You will get an acknowledgement, and we will coordinate a fix and
