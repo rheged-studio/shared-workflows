@@ -22,7 +22,7 @@
 ## 1. Context
 
 The estate is consolidating per-repo, copy-pasted CI onto a single authoritative home —
-`acme-skunkworks/shared-workflows` — with consumer repos keeping thin, SHA-pinned caller stubs
+`acme-studio/shared-workflows` — with consumer repos keeping thin, SHA-pinned caller stubs
 (A-384, A-411). At the same time the `release-orchestrator` has gone live: it opens release-please
 PRs on each target's behalf and **merges them only when a named check-run goes green**. The CI we
 build must therefore satisfy two masters at once — be **fast and low-maintenance** for small
@@ -184,7 +184,7 @@ repo's own Actions (D5).
 └────────────────────────────────────────────────────────────────────┘
         │ cross-repo; workflows float @v1; actions SHA-pinned inside
         ▼
-┌─ acme-skunkworks/shared-workflows ─────────────────────────────────┐
+┌─ acme-studio/shared-workflows ─────────────────────────────────┐
 │  Layer 2 — reusable workflows (on: workflow_call)                   │
 │    reusable-lint.yml (A-415) · reusable-build-test.yml (A-416)    │
 │    reusable-validate-pr-title.yml (A-403, shipped)                 │
@@ -255,7 +255,7 @@ not the whole apparatus.
 `sha_pinning_required` rejects `uses: ./.github/workflows/…`, and a cross-repo self-reference is
 circular before the first tagged SHA exists. So `shared-workflows` itself runs SHA-pinned **inline**
 copies of the PR-title and Claude logic (per its CLAUDE.md), kept in sync with the `reusable-*`
-bodies. Consumers are unaffected — they reference `acme-skunkworks/shared-workflows/…@<sha>`, which
+bodies. Consumers are unaffected — they reference `acme-studio/shared-workflows/…@<sha>`, which
 **is** compliant. This is a property of the host repo, not a wart in the architecture, but it is the
 reason "just call your own reusable workflow" is not on the table here.
 
@@ -392,7 +392,7 @@ aggregator's `needs:`. Only its **gate role** and the transitional scaffolding w
 ## 8. Adjacent work — shared config-package sweep
 
 The shared _workflows_ are only half the consolidation story; the other half is the shared _configs_
-they run. The estate already extracts linters/formatters into publishable `@acme-skunkworks/*`
+they run. The estate already extracts linters/formatters into publishable `@acme-studio/*`
 packages under the **Open source** initiative. Tempest is the canonical baseline here — its lint
 stack is the **superset** the Octavo project will draw from — so the sweep is "diff Tempest's config
 files against the projects that already exist, and create projects for the gaps."
@@ -401,11 +401,11 @@ files against the projects that already exist, and create projects for the gaps.
 
 | Config       | Package                                | Linear project      | State                              |
 | ------------ | -------------------------------------- | ------------------- | ---------------------------------- |
-| ESLint       | `@acme-skunkworks/eslint-config`       | eslint-config       | In Progress (published)            |
-| markdownlint | `@acme-skunkworks/markdownlint-config` | markdownlint-config | In Progress (published)            |
-| TypeScript   | `@acme-skunkworks/tsconfig`            | tsconfig            | Idea (baseline from Tempest; A-96) |
-| Vitest       | `@acme-skunkworks/vitest-config`       | vitest-config       | Idea (baseline from Tempest)       |
-| Stylelint    | `@acme-skunkworks/stylelint-config`    | style-lint          | Idea (Tailwind + standard)         |
+| ESLint       | `@acme-studio/eslint-config`       | eslint-config       | In Progress (published)            |
+| markdownlint | `@acme-studio/markdownlint-config` | markdownlint-config | In Progress (published)            |
+| TypeScript   | `@acme-studio/tsconfig`            | tsconfig            | Idea (baseline from Tempest; A-96) |
+| Vitest       | `@acme-studio/vitest-config`       | vitest-config       | Idea (baseline from Tempest)       |
+| Stylelint    | `@acme-studio/stylelint-config`    | style-lint          | Idea (Tailwind + standard)         |
 
 ### 8.2 Gaps found — and how they were resolved
 
@@ -435,7 +435,7 @@ are per-repo glue.
 When Octavo lands on shared CI it will want the **web-app** slice of Tempest's stack — eslint,
 prettier, tsconfig, markdown, yaml, and (once it has CSS) stylelint — but **not** the SQL/Supabase
 configs. Standing up the new **prettier-config** package now, alongside the already-planned
-tsconfig/vitest/stylelint projects, means Octavo consumes ready-made `@acme-skunkworks/*` presets
+tsconfig/vitest/stylelint projects, means Octavo consumes ready-made `@acme-studio/*` presets
 rather than re-deriving them from Tempest; its **yamllint** comes for free from the shared
 `reusable-lint.yml` (§8.2), not a package. (Note the standing caveat that Octavo's CI itself is
 moving to CircleCI for IPv6/Supabase typegen — A-421 — but its config _packages_ are runner-agnostic
@@ -454,7 +454,7 @@ A quick health-check of the four in-scope npm packages and the configs feeding t
   ESLint and no `tsc`** despite shipping a `tsconfig.json` (type-check-only, `noEmit`, covering its
   7 `infrastructure/scripts/**/*.ts`) — the config exists but no `tsc` script ever runs it (its
   `include` also carries a stale, empty `infrastructure/send-it/**/*.ts`). Decision taken to bring it
-  to parity: **A-394** (revived) wires up `tsc` + adopts `@acme-skunkworks/eslint-config` for the
+  to parity: **A-394** (revived) wires up `tsc` + adopts `@acme-studio/eslint-config` for the
   infra `.ts` scripts. The shareable skill code is `.mjs` (zero-dep ESM, not in any tsconfig), which
   the TS-oriented preset doesn't yet cleanly lint standalone — **A-439** (eslint-config) validates/
   extends `.mjs` coverage and unblocks the `.mjs` half. Sequencing matters: the shared `build-test`

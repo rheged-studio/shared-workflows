@@ -75,7 +75,7 @@ and dogfood them.
 - The `reusable-` prefix avoids a filename collision with the same-named caller
   stub in a consumer.
 - **A Layer-2 workflow references its sibling Layer-1 actions by full cross-repo
-  path, SHA-pinned** (`acme-skunkworks/shared-workflows/.github/actions/…@<sha>`),
+  path, SHA-pinned** (`acme-studio/shared-workflows/.github/actions/…@<sha>`),
   never `./.github/actions/…`: inside a `workflow_call` job a `./` path resolves
   against the **caller's** workspace, not this repo
   ([community #18601](https://github.com/orgs/community/discussions/18601)), and
@@ -186,7 +186,7 @@ reusable workflows stay few and pay setup once. See `.github/actions/README.md`.
 The org enforces **`sha_pinning_required`**, which rejects local
 `uses: ./.github/workflows/…` reusable references — they aren't SHA-pinnable, so
 they fail at startup ([community #170337](https://github.com/orgs/community/discussions/170337)).
-A cross-repo self-reference (`acme-skunkworks/shared-workflows/…@<sha>`) is
+A cross-repo self-reference (`acme-studio/shared-workflows/…@<sha>`) is
 circular before the first tagged SHA exists. So this repo does **not** consume
 its own reusable workflows; `ci.yml` inlines the PR-title and commits checks
 instead (SHA-pinned copies of `reusable-validate-pr-title.yml` /
@@ -291,7 +291,7 @@ Local tooling install (macOS): `brew install yamllint actionlint`.
 
 ## Agent skills
 
-This repo adopts the shared `@acme-skunkworks/agent-skills` bundles, installed via
+This repo adopts the shared `@acme-studio/agent-skills` bundles, installed via
 [skills.sh](https://skills.sh) under `.claude/skills/` (mirrored to `.agents/skills/`
 for Cursor). Each skill reads its own `config.json`, reconciled to this repo's facts by
 the `initialise-skills` skill (base branch, package roots, Linear team / workspace,
@@ -319,7 +319,7 @@ bypass actor). This repo's own caller is
 
 ## Linting and formatting
 
-- **Markdown** — `.markdownlint-cli2.jsonc` extends `@acme-skunkworks/markdownlint-config`.
+- **Markdown** — `.markdownlint-cli2.jsonc` extends `@acme-studio/markdownlint-config`.
 - **YAML** — `.yamllint.yml`: syntax errors fail; style rules are warnings
   (Prettier owns formatting). Workflow truthy values (`on`, `off`, …) allowed.
 - **Workflows** — `actionlint` validates schema + expression syntax.
@@ -339,7 +339,7 @@ apparatus — it holds workflows, not a published package, so CI installs
   isn't installed).
 - **commit-msg** — strips `Co-Authored-By: Claude … <noreply@anthropic.com>`
   trailers (Claude is tooling, not a contributor).
-- **pre-push** — blocks direct pushes to `main` (open a PR instead) and runs A-1023 also runs a best-effort `commitlint --from origin/main --to HEAD` range check, skipping with an install hint when `@commitlint/cli` or `origin/main` is missing; CI’s reusable commit-validation workflow remains authoritative. Configuration is `commitlint.config.mjs`, extending `@acme-skunkworks/commitlint-config`.
+- **pre-push** — blocks direct pushes to `main` (open a PR instead) and runs A-1023 also runs a best-effort `commitlint --from origin/main --to HEAD` range check, skipping with an install hint when `@commitlint/cli` or `origin/main` is missing; CI’s reusable commit-validation workflow remains authoritative. Configuration is `commitlint.config.mjs`, extending `@acme-studio/commitlint-config`.
   yamllint + actionlint as the last gate before CI. Bot identities bypass.
 
 Hooks are dormant in CI: `HUSKY=0` is set on the only job that runs
