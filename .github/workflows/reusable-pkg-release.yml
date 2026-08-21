@@ -83,7 +83,7 @@ name: Reusable / Package release
 #     release:
 #       uses: rheged-studio/shared-workflows/.github/workflows/reusable-pkg-release.yml@<sha>
 #       with:
-#         npm-scope: "@acme-skunkworks"
+#         npm-scope: "@rheged-studio"
 #       permissions:
 #         contents: write
 #         id-token: write
@@ -96,7 +96,7 @@ on:
     inputs:
       npm-scope:
         description: >-
-          The package's npm scope (e.g. `@acme-skunkworks`), used for the GitHub
+          The package's npm scope (e.g. `@rheged-studio`), used for the GitHub
           Packages `setup-node` scope→registry mapping.
         type: string
         required: true

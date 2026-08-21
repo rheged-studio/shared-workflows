@@ -25,19 +25,19 @@ needs.
 
 ## The catalogue
 
-| Action               | What it does                                                                     |
-| -------------------- | -------------------------------------------------------------------------------- |
-| `setup-project`      | pnpm + Node (from `.nvmrc`) + lockfile-keyed pnpm store cache, then install      |
-| `load-repo-config`   | Allowlist-validate `infrastructure/repo-config.yaml` → step outputs (A-779)      |
-| `eslint`             | ESLint over the repo (consumer's flat config + `@acme-skunkworks/eslint-config`) |
-| `lint-markdown`      | markdownlint-cli2                                                                |
-| `lint-yaml`          | yamllint (config injected from this repo, A-438) + actionlint                    |
-| `build`              | `pnpm run build` (verification build; published artefact rebuilt in release)     |
-| `typecheck`          | `tsc --noEmit`                                                                   |
-| `test-vitest`        | `vitest run` (unit tests)                                                        |
-| `test-bats`          | bats (infrastructure tests)                                                      |
-| `shellcheck`         | ShellCheck over tracked shell scripts                                            |
-| `changelog-validate` | dated-changelog format + completeness                                            |
+| Action               | What it does                                                                   |
+| -------------------- | ------------------------------------------------------------------------------ |
+| `setup-project`      | pnpm + Node (from `.nvmrc`) + lockfile-keyed pnpm store cache, then install    |
+| `load-repo-config`   | Allowlist-validate `infrastructure/repo-config.yaml` → step outputs (A-779)    |
+| `eslint`             | ESLint over the repo (consumer's flat config + `@rheged-studio/eslint-config`) |
+| `lint-markdown`      | markdownlint-cli2                                                              |
+| `lint-yaml`          | yamllint (config injected from this repo, A-438) + actionlint                  |
+| `build`              | `pnpm run build` (verification build; published artefact rebuilt in release)   |
+| `typecheck`          | `tsc --noEmit`                                                                 |
+| `test-vitest`        | `vitest run` (unit tests)                                                      |
+| `test-bats`          | bats (infrastructure tests)                                                    |
+| `shellcheck`         | ShellCheck over tracked shell scripts                                          |
+| `changelog-validate` | dated-changelog format + completeness                                          |
 
 `load-repo-config` is consumed via the Layer-2 wrapper
 `reusable-load-repo-config.yml` (floated at `@v1`); do not call the action

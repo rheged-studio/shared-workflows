@@ -13,7 +13,7 @@ name: Reusable / Validate commits
 # The `pull_request` trigger stays in the CALLER stub. Include `synchronize`
 # so the check re-runs when new commits land.
 #
-# Ruleset: floats `@acme-skunkworks/commitlint-config` to latest (public npm,
+# Ruleset: floats `@rheged-studio/commitlint-config` to latest (public npm,
 # no registry auth) so the CI gate and the local husky pre-push hook
 # (A-982) share one ruleset with zero drift. Types are intentionally NOT a
 # workflow input — they live in the package. Merge / revert / fixup / squash
@@ -98,7 +98,7 @@ jobs:
           mkdir -p "$GATE_DIR"
           npm install --prefix "$GATE_DIR" --no-fund --no-audit \
             @commitlint/cli \
-            @acme-skunkworks/commitlint-config
+            @rheged-studio/commitlint-config
           echo "GATE_DIR=${GATE_DIR}" >> "$GITHUB_ENV"
 
       - name: 🔠 Lint commits (base..head)
@@ -109,7 +109,7 @@ jobs:
         run: |
           set -euo pipefail
           "${GATE_DIR}/node_modules/.bin/commitlint" \
-            --extends @acme-skunkworks/commitlint-config \
+            --extends @rheged-studio/commitlint-config \
             --from "${{ github.event.pull_request.base.sha }}" \
             --to "${{ github.event.pull_request.head.sha }}" \
             --verbose

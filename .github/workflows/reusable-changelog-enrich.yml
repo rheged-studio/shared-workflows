@@ -2,7 +2,7 @@ name: Reusable / Changelog enrich
 
 # Reusable (workflow_call) post-merge changelog enricher (A-793 / A-821).
 #
-# Thin CI wrapper around `@acme-skunkworks/changelog-core` — the package is the
+# Thin CI wrapper around `@rheged-studio/changelog-core` — the package is the
 # single source of truth for enrich/finalise logic. This workflow does NOT
 # re-implement field transforms and does NOT depend on a committed or global
 # changelog skill (A-781).
@@ -48,7 +48,7 @@ name: Reusable / Changelog enrich
 # this job. Org var ROADRUNNER_CLIENT_ID must also be visible to the caller
 # (public repos cannot see visibility: private vars — grant selected access).
 #
-# Consumer prerequisite: pin `@acme-skunkworks/changelog-core` as a
+# Consumer prerequisite: pin `@rheged-studio/changelog-core` as a
 # devDependency so `pnpm exec changelog-core` resolves from the lockfile.
 #
 # Consume from another repo (floating major tag `@v1` — see README):

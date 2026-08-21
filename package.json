@@ -1,20 +1,20 @@
 {
-  "name": "@acme-skunkworks/shared-workflows",
+  "name": "@rheged-studio/shared-workflows",
   "version": "1.7.1",
   "private": true,
-  "description": "Reusable GitHub Actions workflows shared across the Acme Skunkworks estate.",
+  "description": "Reusable GitHub Actions workflows shared across the Rheged Studio estate.",
   "keywords": [
     "github-actions",
     "reusable-workflows",
     "ci"
   ],
-  "homepage": "https://github.com/acme-skunkworks/shared-workflows#readme",
+  "homepage": "https://github.com/rheged-studio/shared-workflows#readme",
   "bugs": {
-    "url": "https://github.com/acme-skunkworks/shared-workflows/issues"
+    "url": "https://github.com/rheged-studio/shared-workflows/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/acme-skunkworks/shared-workflows.git"
+    "url": "git+https://github.com/rheged-studio/shared-workflows.git"
   },
   "license": "MIT",
   "author": {
@@ -50,9 +50,9 @@
     ]
   },
   "devDependencies": {
-    "@acme-skunkworks/changelog-core": "^1.1.1",
-    "@acme-skunkworks/commitlint-config": "^1.0.1",
-    "@acme-skunkworks/markdownlint-config": "^3.0.0",
+    "@rheged-studio/changelog-core": "^1.1.1",
+    "@rheged-studio/commitlint-config": "^1.0.1",
+    "@rheged-studio/markdownlint-config": "^3.0.0",
     "@commitlint/cli": "^21.2.1",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.8",
