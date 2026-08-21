@@ -2,10 +2,10 @@
 title: Sweep @acme-skunkworks identifiers to @rheged-studio (A-1414)
 release_note: ""
 created_at: "2026-08-21T10:47:44Z"
-merged_at: ""
+merged_at: "2026-08-21T12:01:53Z"
 branch: a-1414-sweep-rheged-studio-identifiers
-pr:
-commit: ""
+pr: 114
+commit: 991966a
 author: rob.studio
 co_authors: []
 category: chore
@@ -13,9 +13,9 @@ breaking: false
 issues:
   - A-1414
 stats:
-  files_changed:
-  loc_added:
-  loc_removed:
+  files_changed: 55
+  loc_added: 379
+  loc_removed: 482
   commits:
 ---
 
