@@ -29,7 +29,7 @@ needs.
 | -------------------- | -------------------------------------------------------------------------------- |
 | `setup-project`      | pnpm + Node (from `.nvmrc`) + lockfile-keyed pnpm store cache, then install      |
 | `load-repo-config`   | Allowlist-validate `infrastructure/repo-config.yaml` → step outputs (A-779)      |
-| `eslint`             | ESLint over the repo (consumer's flat config + `@acme-skunkworks/eslint-config`) |
+| `eslint`             | ESLint over the repo (consumer's flat config + `@rheged-studio/eslint-config`) |
 | `lint-markdown`      | markdownlint-cli2                                                                |
 | `lint-yaml`          | yamllint (config injected from this repo, A-438) + actionlint                    |
 | `build`              | `pnpm run build` (verification build; published artefact rebuilt in release)     |

@@ -1,7 +1,7 @@
 name: ESLint
 description: >-
   Run ESLint over the repo using the consumer's flat config (which extends
-  `@acme-skunkworks/eslint-config`). Assumes setup-project has already installed
+  `@rheged-studio/eslint-config`). Assumes setup-project has already installed
   dependencies (ADR 0001 §5.7).
 
 # Layer-1 mix-in: a single step in the calling job. ESLint and its config are
