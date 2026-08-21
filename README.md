@@ -26,7 +26,7 @@ release gate pattern).
 | `reusable-pkg-release.yml`        | Build-once → npm OIDC Trusted Publishing → GitHub Packages mirror → tag + release (Layer 2).                                    | — (OIDC + `GITHUB_TOKEN`) |
 | `reusable-load-repo-config.yml`   | Load + allowlist-validate `infrastructure/repo-config.yaml` → job outputs (Layer 2, A-779).                                     | — (uses `GITHUB_TOKEN`)   |
 | `reusable-validate-payload.yml`   | Fan-out payload check — skills bundles and/or `.coderabbit.yaml` (Layer 2).                                                     | — (uses `GITHUB_TOKEN`)   |
-| `reusable-changelog-enrich.yml`   | Post-merge changelog enrich / finalise via `@rheged-studio/changelog-core` (Layer 2).                                         | `ROADRUNNER_PRIVATE_KEY`  |
+| `reusable-changelog-enrich.yml`   | Post-merge changelog enrich / finalise via `@rheged-studio/changelog-core` (Layer 2).                                           | `ROADRUNNER_PRIVATE_KEY`  |
 
 > **Why `reusable-` prefixes?** It lets a consumer repo (and this repo, which
 > dogfoods its own workflows) keep a same-named caller stub — e.g. `claude.yml`

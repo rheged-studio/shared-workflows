@@ -399,8 +399,8 @@ files against the projects that already exist, and create projects for the gaps.
 
 ### 8.1 Config projects that already exist (Open source initiative)
 
-| Config       | Package                                | Linear project      | State                              |
-| ------------ | -------------------------------------- | ------------------- | ---------------------------------- |
+| Config       | Package                              | Linear project      | State                              |
+| ------------ | ------------------------------------ | ------------------- | ---------------------------------- |
 | ESLint       | `@rheged-studio/eslint-config`       | eslint-config       | In Progress (published)            |
 | markdownlint | `@rheged-studio/markdownlint-config` | markdownlint-config | In Progress (published)            |
 | TypeScript   | `@rheged-studio/tsconfig`            | tsconfig            | Idea (baseline from Tempest; A-96) |
