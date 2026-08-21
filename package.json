@@ -1,6 +1,6 @@
 {
   "name": "@rheged-studio/shared-workflows",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "private": true,
   "description": "Reusable GitHub Actions workflows shared across the Rheged Studio estate.",
   "keywords": [
