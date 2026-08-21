@@ -26,7 +26,7 @@ release gate pattern).
 | `reusable-pkg-release.yml`        | Build-once → npm OIDC Trusted Publishing → GitHub Packages mirror → tag + release (Layer 2).                                    | — (OIDC + `GITHUB_TOKEN`) |
 | `reusable-load-repo-config.yml`   | Load + allowlist-validate `infrastructure/repo-config.yaml` → job outputs (Layer 2, A-779).                                     | — (uses `GITHUB_TOKEN`)   |
 | `reusable-validate-payload.yml`   | Fan-out payload check — skills bundles and/or `.coderabbit.yaml` (Layer 2).                                                     | — (uses `GITHUB_TOKEN`)   |
-| `reusable-changelog-enrich.yml`   | Post-merge changelog enrich / finalise via `@acme-studio/changelog-core` (Layer 2).                                         | `ROADRUNNER_PRIVATE_KEY`  |
+| `reusable-changelog-enrich.yml`   | Post-merge changelog enrich / finalise via `@rheged-studio/changelog-core` (Layer 2).                                         | `ROADRUNNER_PRIVATE_KEY`  |
 
 > **Why `reusable-` prefixes?** It lets a consumer repo (and this repo, which
 > dogfoods its own workflows) keep a same-named caller stub — e.g. `claude.yml`
@@ -120,7 +120,7 @@ permissions:
 
 jobs:
   claude:
-    uses: acme-studio/shared-workflows/.github/workflows/reusable-claude.yml@v1
+    uses: rheged-studio/shared-workflows/.github/workflows/reusable-claude.yml@v1
     # Requires CLAUDE_CODE_OAUTH_TOKEN in THIS repo's Actions secrets — NOT
     # ANTHROPIC_API_KEY (an empty ANTHROPIC_API_KEY in the log is a red herring).
     secrets: inherit
@@ -162,7 +162,7 @@ permissions:
 
 jobs:
   claude-review:
-    uses: acme-studio/shared-workflows/.github/workflows/reusable-claude-code-review.yml@v1
+    uses: rheged-studio/shared-workflows/.github/workflows/reusable-claude-code-review.yml@v1
     # Requires CLAUDE_CODE_OAUTH_TOKEN in THIS repo's Actions secrets — NOT
     # ANTHROPIC_API_KEY (an empty ANTHROPIC_API_KEY in the log is a red herring).
     secrets: inherit
@@ -190,7 +190,7 @@ permissions:
 
 jobs:
   pr-title: # ← keep this job id stable across the estate (see below)
-    uses: acme-studio/shared-workflows/.github/workflows/reusable-validate-pr-title.yml@v1
+    uses: rheged-studio/shared-workflows/.github/workflows/reusable-validate-pr-title.yml@v1
 ```
 
 **Required-check context (A-400 / A-405).** The reusable job is named
@@ -220,7 +220,7 @@ permissions:
 
 jobs:
   commits: # ← keep this job id stable across the estate (see below)
-    uses: acme-studio/shared-workflows/.github/workflows/reusable-validate-commits.yml@v1
+    uses: rheged-studio/shared-workflows/.github/workflows/reusable-validate-commits.yml@v1
 ```
 
 **Required-check context (A-400 / A-405).** The reusable job is named
@@ -230,7 +230,7 @@ so every repo reports the same context —
 `commits / Validate commits are Conventional Commits` — which a single
 branch-protection rule can pin estate-wide.
 
-**Ruleset.** Floats [`@acme-studio/commitlint-config`](https://www.npmjs.com/package/@acme-studio/commitlint-config)
+**Ruleset.** Floats [`@rheged-studio/commitlint-config`](https://www.npmjs.com/package/@rheged-studio/commitlint-config)
 to latest on every run (public npm, no registry auth) and lints
 `github.event.pull_request.base.sha..head.sha`. Types live in that package —
 they are intentionally **not** a workflow input, so this gate and the local
@@ -255,7 +255,7 @@ permissions:
 
 jobs:
   lint: # ← keep this job id stable (renders as `lint / Lint`)
-    uses: acme-studio/shared-workflows/.github/workflows/reusable-lint.yml@v1
+    uses: rheged-studio/shared-workflows/.github/workflows/reusable-lint.yml@v1
 ```
 
 Each lane has a boolean opt-out (`eslint`, `markdown`, `yaml`, `actionlint`,
@@ -279,7 +279,7 @@ Caller stub with the optional inputs commented out:
 ```yaml
 jobs:
   lint:
-    uses: acme-studio/shared-workflows/.github/workflows/reusable-lint.yml@v1
+    uses: rheged-studio/shared-workflows/.github/workflows/reusable-lint.yml@v1
     with:
       node-version-file: .nvmrc
       # setup-script: sanity-typegen
@@ -304,7 +304,7 @@ permissions:
 
 jobs:
   build-test: # ← keep this job id stable (renders as `build-test / Build & Test`)
-    uses: acme-studio/shared-workflows/.github/workflows/reusable-build-test.yml@v1
+    uses: rheged-studio/shared-workflows/.github/workflows/reusable-build-test.yml@v1
 ```
 
 Each lane has a boolean opt-out — `build`, `typecheck`, `test` and `shellcheck`
@@ -318,7 +318,7 @@ fast rather than passing green (A-445).
 ```yaml
 jobs:
   build-test:
-    uses: acme-studio/shared-workflows/.github/workflows/reusable-build-test.yml@v1
+    uses: rheged-studio/shared-workflows/.github/workflows/reusable-build-test.yml@v1
     with:
       node-version-file: .nvmrc
       # setup-script: sanity-typegen
@@ -353,9 +353,9 @@ permissions:
 
 jobs:
   release:
-    uses: acme-studio/shared-workflows/.github/workflows/reusable-pkg-release.yml@v1
+    uses: rheged-studio/shared-workflows/.github/workflows/reusable-pkg-release.yml@v1
     with:
-      npm-scope: "@acme-studio"
+      npm-scope: "@rheged-studio"
 ```
 
 **Consumer prerequisite:** define a branch-protected **`npm-release`**
@@ -378,13 +378,13 @@ copy — the composite is SHA-pinned inside the reusable; consumers float `@v1`.
 # .github/workflows/ci.yml (excerpt)
 jobs:
   config:
-    uses: acme-studio/shared-workflows/.github/workflows/reusable-load-repo-config.yml@v1
+    uses: rheged-studio/shared-workflows/.github/workflows/reusable-load-repo-config.yml@v1
     permissions:
       contents: read
 
   lint:
     needs: config
-    uses: acme-studio/shared-workflows/.github/workflows/reusable-lint.yml@v1
+    uses: rheged-studio/shared-workflows/.github/workflows/reusable-lint.yml@v1
     with:
       node-version-file: ${{ needs.config.outputs.node_version_file }}
 ```
@@ -418,7 +418,7 @@ permissions:
 
 jobs:
   validate-payload:
-    uses: acme-studio/shared-workflows/.github/workflows/reusable-validate-payload.yml@v1
+    uses: rheged-studio/shared-workflows/.github/workflows/reusable-validate-payload.yml@v1
     with:
       skills: true # require well-formed .claude/skills/** (+ .agents/skills/**)
       coderabbit: true # require a parseable .coderabbit.yaml
@@ -427,7 +427,7 @@ jobs:
 ### `reusable-changelog-enrich.yml`
 
 Post-merge fill of dated `changelog/` entries via
-[`@acme-studio/changelog-core`](https://www.npmjs.com/package/@acme-studio/changelog-core)
+[`@rheged-studio/changelog-core`](https://www.npmjs.com/package/@rheged-studio/changelog-core)
 (A-793 / A-821). Resolves the just-merged PR from the push SHA, runs `enrich`
 and (optionally) `finalise`, then pushes **only** `changelog/**` as
 `road-runner-bot[bot]`. Write-back mints a repo-scoped installation token from
@@ -443,7 +443,7 @@ v1.5.0 moved the floating major onto that commit.)
 
 **Consumer prerequisites:**
 
-- Add `@acme-studio/changelog-core` as a devDependency so
+- Add `@rheged-studio/changelog-core` as a devDependency so
   `pnpm exec changelog-core` resolves from the lockfile.
 - Org secret `ROADRUNNER_PRIVATE_KEY` and org var `ROADRUNNER_CLIENT_ID` must
   be visible to the caller (grant selected access — public repos cannot see
@@ -471,7 +471,7 @@ permissions:
 
 jobs:
   changelog-enrich:
-    uses: acme-studio/shared-workflows/.github/workflows/reusable-changelog-enrich.yml@v1
+    uses: rheged-studio/shared-workflows/.github/workflows/reusable-changelog-enrich.yml@v1
     with:
       mode: enrich
     secrets: inherit
@@ -487,7 +487,7 @@ git tag (a release-please cut):
 ```yaml
 # Extra job in .github/workflows/pkg-release.yml (alongside `release:`)
 changelog-enrich:
-  uses: acme-studio/shared-workflows/.github/workflows/reusable-changelog-enrich.yml@v1
+  uses: rheged-studio/shared-workflows/.github/workflows/reusable-changelog-enrich.yml@v1
   with:
     mode: finalise
   permissions:
@@ -507,7 +507,7 @@ token, not `GITHUB_TOKEN`. A-793's "no publish scopes" constraint (no
 Pin every reusable-workflow caller to the **floating major tag `@v1`**:
 
 ```yaml
-uses: acme-studio/shared-workflows/.github/workflows/reusable-claude.yml@v1
+uses: rheged-studio/shared-workflows/.github/workflows/reusable-claude.yml@v1
 ```
 
 `v1` moves forward onto each new `vX.Y.Z` release, so non-breaking fixes and

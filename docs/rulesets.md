@@ -50,7 +50,7 @@ below.
 ## Scope
 
 Rulesets here apply to **org** repositories only
-(`acme-studio/<repo>`). Personal-account consumers are out of scope.
+(`rheged-studio/<repo>`). Personal-account consumers are out of scope.
 
 ## The Conventional-Commit contexts have two forms — pick the ones your repo emits
 
@@ -110,7 +110,7 @@ The apply **replaces** the live ruleset — it does not add a second overlapping
    ```bash
    # shared-workflows ONLY — apply the context-swapped file from the section above
    # (its inline pr-title context differs), never trunk.json directly:
-   gh api --method PUT repos/acme-studio/shared-workflows/rulesets/<id> \
+   gh api --method PUT repos/rheged-studio/shared-workflows/rulesets/<id> \
      --input /tmp/trunk-shared-workflows.json
    ```
 

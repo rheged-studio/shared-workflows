@@ -100,10 +100,10 @@ status checks are pinned to the GitHub Actions integration (`integration_id: 153
 **Live API probe (2026-07-15):**
 
 ```text
-$ gh api /orgs/acme-studio/actions/permissions
+$ gh api /orgs/rheged-studio/actions/permissions
   { "sha_pinning_required": true, ... }                     # org-wide — see §5
 
-$ gh api /repos/acme-studio/shared-workflows/rulesets
+$ gh api /repos/rheged-studio/shared-workflows/rulesets
   16137621  "Protect main trunk"  Organization  active      # deletion + non_fast_forward
   18130461  "Trunk"               Repository     active      # the trunk.json ruleset
 ```
@@ -134,11 +134,11 @@ A-422 requires confirming the "block non-SHA-pinned actions" policy is enforced 
 level, not merely per repo. **Confirmed:**
 
 ```text
-$ gh api /orgs/acme-studio/actions/permissions
+$ gh api /orgs/rheged-studio/actions/permissions
   { "enabled_repositories": "all", "allowed_actions": "all", "sha_pinning_required": true }
 ```
 
-`sha_pinning_required: true` on `/orgs/acme-studio/…` means every repo in the org
+`sha_pinning_required: true` on `/orgs/rheged-studio/…` means every repo in the org
 rejects an unpinned third-party `uses:` at workflow start-up — a missed pin cannot ship,
 regardless of per-repo settings. This governs third-party `uses:` **actions**;
 reusable-**workflow** calls are tag-exempt under the same rule, which is exactly what lets
@@ -184,7 +184,7 @@ both `github-actions` and `npm`. The `github-actions` ecosystem scans every `use
 `pnpm/action-setup`, …) are bumped in the weekly grouped `ci:` PR.
 
 By design it does **not** bump the internal same-repo
-`acme-studio/shared-workflows/.github/actions/…@<sha>` self-references — those advance
+`rheged-studio/shared-workflows/.github/actions/…@<sha>` self-references — those advance
 with the floating-tag flow, not a registry bump.
 
 **Verdict:** ✅ CONFIRMED.
