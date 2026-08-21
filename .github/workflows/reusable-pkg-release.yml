@@ -313,7 +313,7 @@ jobs:
           echo "Upgraded npm at $PNPM_HOME/npm: $("$PNPM_HOME/npm" --version)"
 
       # Publish-only: versioning (the release PR bumping package.json +
-      # .release-please-manifest.json) is owned by the private release-orchestrator
+      # .release-please-manifest.json) is owned by Clacks
       # running release-please. This keyless gate replaces a changeset scan: we
       # publish iff package.json's version has no matching git tag yet. On a
       # feature merge the version is unchanged → its tag exists → clean no-op; on

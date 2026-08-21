@@ -2,7 +2,7 @@ name: Reusable / Validate fanned payload
 
 # Reusable (workflow_call) version of the estate's fan-out PAYLOAD check (A-738).
 #
-# The release-orchestrator fan-out spine (A-711) accepts `mergeable_state:
+# The Clacks fan-out spine (A-711) accepts `mergeable_state:
 # unstable` as mergeable — it must, so a skipped review bot (A-396) doesn't wedge
 # the merge. But that means a consumer whose ONLY required checks are the
 # `GO/NO GO` aggregator and `pr-title` has NOTHING validating the fanned payload

@@ -542,7 +542,7 @@ updates:
 ```
 
 Releases here are tagged (`vX.Y.Z`) automatically by release-please (driven by
-the private release-orchestrator as a `kind: deploy` target), and the floating
+Clacks as a `kind: deploy` target), and the floating
 **`v1`** tag tracks the latest `v1.x`. The full history lives in [`changelog/`](changelog/)
 and on the [releases page](https://github.com/rheged-studio/shared-workflows/releases),
 each tag with a matching GitHub release. Prefer `@v1`; if you need to pin an exact

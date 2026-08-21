@@ -262,7 +262,7 @@ release-orchestrator target.
 - **`move-floating-major.yml`** force-moves the floating major tag (`v1`, …) onto
   each release commit — shared-workflows-specific (consumers pin `@v1`, A-662),
   which octavo has no equivalent of.
-- **Release cutover (A-597) — complete.** The private release-orchestrator now
+- **Release cutover (A-597) — complete.** Clacks now
   drives release-please for this repo as a `kind: deploy` target (its
   `orchestrate-releases.yml` matrix); on a releasable merge it maintains the
   release PR and cuts the `vX.Y.Z` tag + GitHub Release directly from the
