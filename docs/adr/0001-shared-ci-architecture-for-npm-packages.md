@@ -184,7 +184,7 @@ repo's own Actions (D5).
 └────────────────────────────────────────────────────────────────────┘
         │ cross-repo; workflows float @v1; actions SHA-pinned inside
         ▼
-┌─ rheged-studio/shared-workflows ─────────────────────────────────┐
+┌─ rheged-studio/shared-workflows ───────────────────────────────────┐
 │  Layer 2 — reusable workflows (on: workflow_call)                   │
 │    reusable-lint.yml (A-415) · reusable-build-test.yml (A-416)    │
 │    reusable-validate-pr-title.yml (A-403, shipped)                 │
