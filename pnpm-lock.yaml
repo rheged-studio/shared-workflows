@@ -12,14 +12,14 @@ importers:
         specifier: ^21.2.1
         version: 21.2.2(@types/node@26.2.0)(conventional-commits-parser@7.1.2)(typescript@7.0.2)
       '@rheged-studio/changelog-core':
-        specifier: ^1.1.1
-        version: 1.1.1
+        specifier: ^1.1.2
+        version: 1.1.2
       '@rheged-studio/commitlint-config':
-        specifier: ^1.0.1
-        version: 1.0.1
+        specifier: ^1.0.2
+        version: 1.0.2
       '@rheged-studio/markdownlint-config':
-        specifier: ^3.0.0
-        version: 3.0.1
+        specifier: ^3.0.2
+        version: 3.0.2
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -143,17 +143,17 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
-  '@rheged-studio/changelog-core@1.1.1':
-    resolution: {integrity: sha512-GaZ1OLohQGuG4XG6xVyHWSC8Zi9WZKu3Yhcbc7f+aI0gscn0KEzAcvu7tcryuBCuRc4b4J6sJEhJ92Mzc0ksDg==}
+  '@rheged-studio/changelog-core@1.1.2':
+    resolution: {integrity: sha512-wfHZPpws0nhs47ZkzEX9R4lJuMbeBdR5o3FqOB4B0Ihv0neXnnlAHRJ34CVfCkZBK04IWR4lpf5X2XPPxHQqZQ==}
     engines: {node: '>=22'}
     hasBin: true
 
-  '@rheged-studio/commitlint-config@1.0.1':
-    resolution: {integrity: sha512-WFDoaeNRdAer3Ma8KPdl9/WQHcPodZCHCS820PpU6eumiWxY8HSIhLpESvWcr5IHQhV0DixRjRtqK/leqYE1Hg==}
+  '@rheged-studio/commitlint-config@1.0.2':
+    resolution: {integrity: sha512-KnafGWWjXjF7efrNep9yiVAYiKLMAtJGiwRhBM34WwGI4STM8vN2fLO824FfthL9KchkDL/u0QaYPfEzMKPICQ==}
     engines: {node: '>=22'}
 
-  '@rheged-studio/markdownlint-config@3.0.1':
-    resolution: {integrity: sha512-kUaE/3d0f7cYMrLhIYoxmXN+O7YQc2s2204OZ6nZRRr2MlEKWm5d7AZRG9eRyzTKgYSj0TtATRnK1lmrUmwxBQ==}
+  '@rheged-studio/markdownlint-config@3.0.2':
+    resolution: {integrity: sha512-rC9gbcmhMp35oX/2L2FlsjB7Jlae2qa8mKYgmf3AaIvDTBzjDOlRXKPXT/mEVCvWnAsDigc8Syfk4Pao8zdnpg==}
     engines: {node: '>=22'}
 
   '@simple-libs/child-process-utils@2.0.0':
@@ -958,14 +958,14 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.1
 
-  '@rheged-studio/changelog-core@1.1.1': {}
+  '@rheged-studio/changelog-core@1.1.2': {}
 
-  '@rheged-studio/commitlint-config@1.0.1':
+  '@rheged-studio/commitlint-config@1.0.2':
     dependencies:
       '@commitlint/config-conventional': 21.2.2
       '@commitlint/types': 21.2.0
 
-  '@rheged-studio/markdownlint-config@3.0.1': {}
+  '@rheged-studio/markdownlint-config@3.0.2': {}
 
   '@simple-libs/child-process-utils@2.0.0':
     dependencies:
