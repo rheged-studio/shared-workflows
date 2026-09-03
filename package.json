@@ -50,12 +50,12 @@
     ]
   },
   "devDependencies": {
-    "@rheged-studio/changelog-core": "^1.1.1",
-    "@rheged-studio/commitlint-config": "^1.0.1",
-    "@rheged-studio/markdownlint-config": "^3.0.0",
+    "@rheged-studio/changelog-core": "^1.1.2",
+    "@rheged-studio/commitlint-config": "^1.0.2",
+    "@rheged-studio/markdownlint-config": "^3.0.2",
     "@commitlint/cli": "^21.2.1",
     "husky": "^9.1.7",
-    "lint-staged": "^17.0.8",
+    "lint-staged": "^17.4.1",
     "markdownlint-cli2": "^0.23.0",
     "prettier": "^3.9.5",
     "sort-package-json": "^4.0.0"
