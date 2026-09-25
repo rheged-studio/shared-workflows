@@ -1,14 +1,11 @@
 ---
 title: Parameterise changelog-enrich bot/App identity
-release_note: >-
-  reusable-changelog-enrich accepts configurable GitHub App credentials and git
-  author identity (road-runner defaults unchanged); load-repo-config exposes
-  optional bot/App keys for caller wiring.
+release_note: reusable-changelog-enrich accepts configurable GitHub App credentials and git author identity (road-runner defaults unchanged); load-repo-config exposes optional bot/App keys for caller wiring.
 created_at: "2026-09-25T13:52:20Z"
-merged_at: ""
+merged_at: "2026-09-25T14:08:01Z"
 branch: a-1927-parameterise-reusable-changelog-enrich-botapp-via-repo
-pr:
-commit:
+pr: 121
+commit: f5e33cb
 author: rob.studio
 co_authors: []
 category: feature
@@ -16,9 +13,9 @@ breaking: false
 issues:
   - A-1927
 stats:
-  files_changed:
-  loc_added:
-  loc_removed:
+  files_changed: 8
+  loc_added: 223
+  loc_removed: 80
   commits:
 ---
 
