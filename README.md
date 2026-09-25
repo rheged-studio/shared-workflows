@@ -15,18 +15,18 @@ release gate pattern).
 
 ## Available workflows
 
-| Workflow                          | Purpose                                                                                                                         | Secrets                   |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
-| `reusable-claude.yml`             | Interactive `@claude` on issues / PR comments / reviews.                                                                        | `CLAUDE_CODE_OAUTH_TOKEN` |
-| `reusable-claude-code-review.yml` | Automated Claude review on pull requests.                                                                                       | `CLAUDE_CODE_OAUTH_TOKEN` |
-| `reusable-validate-pr-title.yml`  | Enforce a Conventional Commit PR title (dual merge policy; not sole bump signal — A-1176).                                      | — (uses `GITHUB_TOKEN`)   |
-| `reusable-validate-commits.yml`   | Enforce Conventional Commits on every `base..head` commit (A-981; per-commit merge gate).                                       | — (uses `GITHUB_TOKEN`)   |
-| `reusable-lint.yml`               | Coarse lint bundle — ESLint, markdownlint, yamllint/actionlint, changelog-validate, optional Prettier + setup-script (Layer 2). | — (uses `GITHUB_TOKEN`)   |
-| `reusable-build-test.yml`         | Coarse build/test bundle — build, typecheck, Vitest, ShellCheck, bats (Layer 2).                                                | — (uses `GITHUB_TOKEN`)   |
-| `reusable-pkg-release.yml`        | Build-once → npm OIDC Trusted Publishing → GitHub Packages mirror → tag + release (Layer 2).                                    | — (OIDC + `GITHUB_TOKEN`) |
-| `reusable-load-repo-config.yml`   | Load + allowlist-validate `infrastructure/repo-config.yaml` → job outputs (Layer 2, A-779).                                     | — (uses `GITHUB_TOKEN`)   |
-| `reusable-validate-payload.yml`   | Fan-out payload check — skills bundles and/or `.coderabbit.yaml` (Layer 2).                                                     | — (uses `GITHUB_TOKEN`)   |
-| `reusable-changelog-enrich.yml`   | Post-merge changelog enrich / finalise via `@rheged-studio/changelog-core` (Layer 2).                                           | `ROADRUNNER_PRIVATE_KEY`  |
+| Workflow                          | Purpose                                                                                                                         | Secrets                                           |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| `reusable-claude.yml`             | Interactive `@claude` on issues / PR comments / reviews.                                                                        | `CLAUDE_CODE_OAUTH_TOKEN`                         |
+| `reusable-claude-code-review.yml` | Automated Claude review on pull requests.                                                                                       | `CLAUDE_CODE_OAUTH_TOKEN`                         |
+| `reusable-validate-pr-title.yml`  | Enforce a Conventional Commit PR title (dual merge policy; not sole bump signal — A-1176).                                      | — (uses `GITHUB_TOKEN`)                           |
+| `reusable-validate-commits.yml`   | Enforce Conventional Commits on every `base..head` commit (A-981; per-commit merge gate).                                       | — (uses `GITHUB_TOKEN`)                           |
+| `reusable-lint.yml`               | Coarse lint bundle — ESLint, markdownlint, yamllint/actionlint, changelog-validate, optional Prettier + setup-script (Layer 2). | — (uses `GITHUB_TOKEN`)                           |
+| `reusable-build-test.yml`         | Coarse build/test bundle — build, typecheck, Vitest, ShellCheck, bats (Layer 2).                                                | — (uses `GITHUB_TOKEN`)                           |
+| `reusable-pkg-release.yml`        | Build-once → npm OIDC Trusted Publishing → GitHub Packages mirror → tag + release (Layer 2).                                    | — (OIDC + `GITHUB_TOKEN`)                         |
+| `reusable-load-repo-config.yml`   | Load + allowlist-validate `infrastructure/repo-config.yaml` → job outputs (Layer 2, A-779).                                     | — (uses `GITHUB_TOKEN`)                           |
+| `reusable-validate-payload.yml`   | Fan-out payload check — skills bundles and/or `.coderabbit.yaml` (Layer 2).                                                     | — (uses `GITHUB_TOKEN`)                           |
+| `reusable-changelog-enrich.yml`   | Post-merge changelog enrich / finalise via `@rheged-studio/changelog-core` (Layer 2).                                           | `ROADRUNNER_PRIVATE_KEY` and/or `APP_PRIVATE_KEY` |
 
 > **Why `reusable-` prefixes?** It lets a consumer repo (and this repo, which
 > dogfoods its own workflows) keep a same-named caller stub — e.g. `claude.yml`
@@ -390,8 +390,9 @@ jobs:
 ```
 
 Outputs: `default_branch`, `node_version_file`, `npm_registry_url`, `npm_scope`,
-`github_packages_registry_url`. Callers map only the subset their downstream
-jobs need.
+`github_packages_registry_url`, and optional `app_client_id`, `bot_name`,
+`bot_email` (changelog write-back identity — A-1927). Callers map only the subset
+their downstream jobs need.
 
 ### `reusable-validate-payload.yml`
 
@@ -429,12 +430,16 @@ jobs:
 Post-merge fill of dated `changelog/` entries via
 [`@rheged-studio/changelog-core`](https://www.npmjs.com/package/@rheged-studio/changelog-core)
 (A-793 / A-821). Resolves the just-merged PR from the push SHA, runs `enrich`
-and (optionally) `finalise`, then pushes **only** `changelog/**` as
-`road-runner-bot[bot]`. Write-back mints a repo-scoped installation token from
-org var `ROADRUNNER_CLIENT_ID` + secret `ROADRUNNER_PRIVATE_KEY` — Actions
-cannot be a Trunk bypass actor on this org (ADR 0004 / A-794), so the bypass
-actor is road-runner-bot and the path limit is workflow discipline (stage only
-`changelog/**`). Callers **must** pass `secrets: inherit`.
+and (optionally) `finalise`, then pushes **only** `changelog/**` as the configured
+bot (Rheged default: `road-runner-bot[bot]`). Write-back mints a repo-scoped
+GitHub App installation token — Actions cannot be a Trunk bypass actor on this
+org (ADR 0004 / A-794), so the protected-branch bypass actor **must match** the
+configured bot; the path limit is workflow discipline (stage only `changelog/**`).
+
+Rheged adopters pass `secrets: inherit` and rely on road-runner defaults
+(`ROADRUNNER_PRIVATE_KEY` + `vars.ROADRUNNER_CLIENT_ID`). Other repos pass
+`APP_PRIVATE_KEY`, `app-id` or `app-client-id`, and `bot-name` / `bot-email`
+inputs (A-1927).
 
 `@v1` includes the road-runner-bot write-back (A-821) as of **v1.5.0**, so pin
 callers to `@v1` like any other reusable workflow — no SHA pin is needed. (Early
@@ -445,10 +450,13 @@ v1.5.0 moved the floating major onto that commit.)
 
 - Add `@rheged-studio/changelog-core` as a devDependency so
   `pnpm exec changelog-core` resolves from the lockfile.
-- Org secret `ROADRUNNER_PRIVATE_KEY` and org var `ROADRUNNER_CLIENT_ID` must
-  be visible to the caller (grant selected access — public repos cannot see
-  `visibility: private` vars/secrets).
-- Protected `main` must allow road-runner-bot as a Trunk bypass actor
+- **Rheged (road-runner):** org secret `ROADRUNNER_PRIVATE_KEY` and org var
+  `ROADRUNNER_CLIENT_ID` visible to the caller (`secrets: inherit`; grant
+  selected access for private vars/secrets).
+- **Other bots:** map `APP_PRIVATE_KEY` and pass `app-id` or `app-client-id`
+  plus `bot-name` / `bot-email`; optional keys in `repo-config.yaml` can feed
+  the `with:` block via `reusable-load-repo-config.yml`.
+- Protected `main` must allow the configured bot as a Trunk bypass actor
   (ADR 0004).
 
 #### Deploy targets (`mode: enrich`)
@@ -500,7 +508,8 @@ changelog-enrich:
 `contents: read` covers checkout + resolve — write to `main` uses the App
 token, not `GITHUB_TOKEN`. A-793's "no publish scopes" constraint (no
 `id-token` / `packages` / `attestations`) still holds. Other inputs:
-`node-version-file` (default `.nvmrc`) and `changelog-dir` (default `changelog`).
+`node-version-file` (default `.nvmrc`), `changelog-dir` (default `changelog`),
+`app-client-id`, `app-id`, `bot-name`, and `bot-email` (road-runner defaults).
 
 ## Versioning
 

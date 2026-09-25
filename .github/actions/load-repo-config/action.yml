@@ -23,6 +23,24 @@ outputs:
     description: GitHub Packages npm registry URL (secondary publish target, ASW-323).
     value: ${{ steps.load.outputs.github_packages_registry_url }}
 
+  app_client_id:
+    description: >-
+      GitHub App OAuth client id for changelog write-back (optional;
+      infrastructure/repo-config.yaml githubAppClientId).
+    value: ${{ steps.load.outputs.app_client_id }}
+
+  bot_name:
+    description: >-
+      Bot login for changelog git commits, e.g. road-runner-bot[bot] (optional;
+      infrastructure/repo-config.yaml botName).
+    value: ${{ steps.load.outputs.bot_name }}
+
+  bot_email:
+    description: >-
+      Bot noreply email for changelog git commits (optional;
+      infrastructure/repo-config.yaml botEmail).
+    value: ${{ steps.load.outputs.bot_email }}
+
 runs:
   using: composite
   steps:
@@ -59,11 +77,13 @@ runs:
         # embedded newline can't satisfy the pattern on a single line. No
         # untrusted path exists today (the file only changes via a merged PR),
         # but this fails closed.
-        token   = /\A[A-Za-z0-9._\/-]+\z/         # branch names, file paths
+        token   = /\A[A-Za-z0-9._\/-]+\z/         # branch names, file paths, App client ids
         url     = /\Ahttps:\/\/[A-Za-z0-9._:\/-]+\z/  # https registry URLs
         scope   = /\A@[a-z0-9-]+\z/               # npm scope
+        bot_name_pat = /\A[A-Za-z0-9._\[\]-]+\z/  # e.g. road-runner-bot[bot]
+        bot_email_pat = /\A[A-Za-z0-9.+\[\]-]+@users\.noreply\.github\.com\z/
 
-        mapping = [
+        required_mapping = [
           ["default_branch", "defaultBranch", token],
           ["node_version_file", "nodeVersionFile", token],
           ["npm_registry_url", "npmRegistryUrl", url],
@@ -71,19 +91,25 @@ runs:
           ["github_packages_registry_url", "githubPackagesRegistryUrl", url]
         ]
 
-        mapping.each do |output_key, yaml_key, pattern|
+        optional_mapping = [
+          ["app_client_id", "githubAppClientId", token],
+          ["bot_name", "botName", bot_name_pat],
+          ["bot_email", "botEmail", bot_email_pat]
+        ]
+
+        validate_and_store = lambda do |output_key, yaml_key, pattern, required|
           raw = cfg[yaml_key]
           if raw.nil? || raw.to_s.strip.empty?
-            warn("::error title=missing key::#{yaml_key} missing or empty in infrastructure/repo-config.yaml")
-            abort
+            if required
+              warn("::error title=missing key::#{yaml_key} missing or empty in infrastructure/repo-config.yaml")
+              abort
+            end
+            pairs[output_key] = ""
+            return
           end
 
           value = raw.to_s.strip
 
-          # Guard the `name=value` line format itself, ahead of the pattern
-          # check: a newline could append a second output line (output
-          # injection), and an `=` could corrupt the key/value split. None of
-          # the five mapped keys legitimately contain either, so reject both.
           if value.include?("\n") || value.include?("=")
             warn("::error title=invalid value::#{yaml_key} contains a newline or '=' — refusing to write to GITHUB_OUTPUT")
             abort
@@ -95,6 +121,14 @@ runs:
           end
 
           pairs[output_key] = value
+        end
+
+        required_mapping.each do |output_key, yaml_key, pattern|
+          validate_and_store.call(output_key, yaml_key, pattern, true)
+        end
+
+        optional_mapping.each do |output_key, yaml_key, pattern|
+          validate_and_store.call(output_key, yaml_key, pattern, false)
         end
 
         File.open(gh_out, "a") do |f|

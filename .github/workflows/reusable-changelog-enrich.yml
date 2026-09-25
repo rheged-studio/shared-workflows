@@ -26,9 +26,10 @@ name: Reusable / Changelog enrich
 #              version.
 #
 # Write-back (A-821 / ADR 0004): direct push to main of `changelog/**` only, as
-# road-runner-bot[bot], with rebase-retry. Actions cannot be a Trunk bypass
-# actor on this org (HTTP 422), so the job mints a repo-scoped road-runner-bot
-# installation token. Path limit is workflow discipline (stage only
+# the configured bot (default road-runner-bot[bot]), with rebase-retry. Actions
+# cannot be a Trunk bypass actor on this org (HTTP 422), so the job mints a
+# repo-scoped GitHub App installation token. Protected-branch bypass actor must
+# match the configured bot. Path limit is workflow discipline (stage only
 # changelog/**) — the bypass actor itself is not path-scoped. App-token pushes
 # DO re-fire workflows; the resolve step's "no associated PR" path is the loop
 # guard (a bot enrich commit has no PR → clean no-op).
@@ -44,9 +45,10 @@ name: Reusable / Changelog enrich
 # "no publish scopes" constraint (no id-token / packages / attestations) still
 # holds.
 #
-# REQUIRED CALLER SECRETS: `secrets: inherit` so ROADRUNNER_PRIVATE_KEY reaches
-# this job. Org var ROADRUNNER_CLIENT_ID must also be visible to the caller
-# (public repos cannot see visibility: private vars — grant selected access).
+# REQUIRED CALLER SECRETS: Rheged repos use `secrets: inherit` so
+# ROADRUNNER_PRIVATE_KEY reaches this job (pairs with vars.ROADRUNNER_CLIENT_ID).
+# Non-road-runner repos map APP_PRIVATE_KEY and pass app-id / bot-name / bot-email
+# inputs (A-1927). Org vars must be visible to the caller (grant selected access).
 #
 # Consumer prerequisite: pin `@rheged-studio/changelog-core` as a
 # devDependency so `pnpm exec changelog-core` resolves from the lockfile.
@@ -103,13 +105,41 @@ on:
         type: string
         required: false
         default: changelog
+      app-client-id:
+        description: >-
+          GitHub App OAuth client id for write-back token mint. When empty,
+          falls back to the caller's vars.ROADRUNNER_CLIENT_ID (Rheged default).
+        type: string
+        required: false
+        default: ""
+      app-id:
+        description: >-
+          GitHub App numeric id for write-back token mint when client-id is not
+          used (e.g. vars.APP_ID on Tempest).
+        type: string
+        required: false
+        default: ""
+      bot-name:
+        description: Git author name for changelog write-back commits.
+        type: string
+        required: false
+        default: road-runner-bot[bot]
+      bot-email:
+        description: Git author email for changelog write-back commits.
+        type: string
+        required: false
+        default: 240737333+road-runner-bot[bot]@users.noreply.github.com
     secrets:
       ROADRUNNER_PRIVATE_KEY:
         description: >-
-          road-runner-bot App private key (org secret). Used to mint a
-          repo-scoped installation token for the changelog/** write-back
-          (A-821 / ADR 0004).
-        required: true
+          road-runner-bot App private key (org secret). Rheged default when
+          APP_PRIVATE_KEY is unset (A-821 / ADR 0004).
+        required: false
+      APP_PRIVATE_KEY:
+        description: >-
+          Generic GitHub App private key for changelog write-back (A-1927).
+          Takes precedence over ROADRUNNER_PRIVATE_KEY when set.
+        required: false
 
 # Deny all token scopes at the workflow root; the job grants the least privilege
 # needed for resolve (GITHUB_TOKEN) + App-token mint.
@@ -127,6 +157,8 @@ jobs:
       HUSKY: 0
       CHANGELOG_DIR: ${{ inputs.changelog-dir }}
       MODE: ${{ inputs.mode }}
+      BOT_NAME: ${{ inputs.bot-name }}
+      BOT_EMAIL: ${{ inputs.bot-email }}
     steps:
       - name: 🚫 Validate mode
         run: |
@@ -139,31 +171,52 @@ jobs:
               ;;
           esac
 
-      - name: 🚦 Guard — ROADRUNNER_PRIVATE_KEY is set
-        # A-646 / A-422: `required: true` on a workflow_call secret only forces the
-        # caller to MAP the secret (e.g. `secrets: inherit`) — it does NOT guarantee
-        # a non-empty VALUE. A consumer inheriting from a repo where the key is unset
-        # passes an empty string that satisfies the schema, then
-        # create-github-app-token dies deep in its JWT signing with an opaque error
-        # and the write-back silently never happens. Fail fast here with a clear
-        # message (mirrors the guard in reusable-claude.yml). `secrets` isn't
-        # available in a step `if:`, so map it into `env:` and test the shell.
+      - name: 🚦 Guard — App private key is set
+        # A-646 / A-422: optional workflow_call secrets do not guarantee a
+        # non-empty VALUE. Fail fast before create-github-app-token (mirrors
+        # reusable-claude.yml).
         env:
+          APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
           ROADRUNNER_PRIVATE_KEY: ${{ secrets.ROADRUNNER_PRIVATE_KEY }}
         run: |
           set -euo pipefail
-          if [ -z "${ROADRUNNER_PRIVATE_KEY:-}" ]; then
-            echo "::error::ROADRUNNER_PRIVATE_KEY is empty. Define it as a repository Actions secret in the consuming repo and pass 'secrets: inherit' from the caller (A-646). It pairs with the vars.ROADRUNNER_CLIENT_ID variable."
+          if [ -z "${APP_PRIVATE_KEY:-}" ] && [ -z "${ROADRUNNER_PRIVATE_KEY:-}" ]; then
+            echo "::error::No App private key. Map secrets.APP_PRIVATE_KEY or pass ROADRUNNER_PRIVATE_KEY via secrets: inherit (A-646 / A-1927)."
             exit 1
           fi
-          echo "OK — ROADRUNNER_PRIVATE_KEY is present."
+          echo "OK — App private key is present."
 
-      - name: 🔑 Mint repo-scoped road-runner-bot token
+      - name: ⚙️ Resolve GitHub App mint inputs
+        id: app_mint
+        env:
+          APP_CLIENT_ID_INPUT: ${{ inputs.app-client-id }}
+          APP_ID_INPUT: ${{ inputs.app-id }}
+          ROADRUNNER_CLIENT_ID: ${{ vars.ROADRUNNER_CLIENT_ID }}
+        run: |
+          set -euo pipefail
+          client_id="${APP_CLIENT_ID_INPUT:-}"
+          if [ -z "$client_id" ]; then
+            client_id="${ROADRUNNER_CLIENT_ID:-}"
+          fi
+          app_id="${APP_ID_INPUT:-}"
+          if [ -n "$client_id" ]; then
+            echo "client_id=$client_id" >> "$GITHUB_OUTPUT"
+            echo "Minting with GitHub App client id."
+          elif [ -n "$app_id" ]; then
+            echo "app_id=$app_id" >> "$GITHUB_OUTPUT"
+            echo "Minting with GitHub App id."
+          else
+            echo "::error::No App identity for token mint. Pass app-client-id, ensure vars.ROADRUNNER_CLIENT_ID is visible, or pass app-id (A-1927)."
+            exit 1
+          fi
+
+      - name: 🔑 Mint repo-scoped App token
         id: token
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
-          client-id: ${{ vars.ROADRUNNER_CLIENT_ID }}
-          private-key: ${{ secrets.ROADRUNNER_PRIVATE_KEY }}
+          client-id: ${{ steps.app_mint.outputs.client_id }}
+          app-id: ${{ steps.app_mint.outputs.app_id }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY != '' && secrets.APP_PRIVATE_KEY || secrets.ROADRUNNER_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
           repositories: ${{ github.event.repository.name }}
           # contents only — PR resolve uses github.token; do not widen the App
@@ -317,6 +370,8 @@ jobs:
 
       - name: 📤 Commit and push changelog/**
         env:
+          BOT_NAME: ${{ inputs.bot-name }}
+          BOT_EMAIL: ${{ inputs.bot-email }}
           CHANGELOG_DIR: ${{ inputs.changelog-dir }}
           APP_TOKEN: ${{ steps.token.outputs.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
@@ -330,8 +385,8 @@ jobs:
             exit 0
           fi
 
-          git config user.name "road-runner-bot[bot]"
-          git config user.email "240737333+road-runner-bot[bot]@users.noreply.github.com"
+          git config user.name "$BOT_NAME"
+          git config user.email "$BOT_EMAIL"
           git add -- "$CHANGELOG_DIR"
           if git diff --cached --quiet; then
             echo "No changelog changes — nothing to push."

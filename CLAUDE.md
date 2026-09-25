@@ -311,10 +311,12 @@ This repo runs the shared **`changelog`** flow (A-597): the `changelog` skill is
 installed, `send-it` authors a dated `changelog/` entry per branch
 (`changelog: true` in its `config.json`), and CI validates entries against the
 contract via the `📓 Changelog` job in the `GO/NO GO` aggregator. Post-merge
-enrichment lives in `reusable-changelog-enrich.yml` (A-793 / A-821) — consumers
-call it with `secrets: inherit` so the job can mint a road-runner-bot
-installation token and push `changelog/**` (ADR 0004; Actions cannot be a Trunk
-bypass actor). This repo's own caller is
+enrichment lives in `reusable-changelog-enrich.yml` (A-793 / A-821 / A-1927) —
+consumers call it with `secrets: inherit` (Rheged road-runner defaults) or map
+`APP_PRIVATE_KEY` plus bot/App `with:` inputs for other bots; the job mints a
+GitHub App installation token and pushes `changelog/**` (ADR 0004; Actions
+cannot be a Trunk bypass actor — bypass actor must match the configured bot).
+This repo's own caller is
 `.github/workflows/changelog-enrich.yml` (`mode: enrich`, A-800).
 
 ## Linting and formatting

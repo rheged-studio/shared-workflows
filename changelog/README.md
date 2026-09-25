@@ -32,8 +32,8 @@ major tag.
 > **Post-merge enrichment (A-793 / A-821).** These entries are filled in after
 > merge with their `merged_at` / `commit` / `pr` / `stats` fields by the in-repo
 > [`changelog-enrich.yml`](../.github/workflows/changelog-enrich.yml) workflow
-> (`mode: enrich`), which pushes only `changelog/**` back to `main` as
-> `road-runner-bot[bot]`. So an entry authored on a branch carries blank
+> (`mode: enrich`), which pushes only `changelog/**` back to `main` as the
+> configured bot (here: `road-runner-bot[bot]`). So an entry authored on a branch carries blank
 > post-merge fields until that workflow runs.
 
 The entries up to and including `v1.0.0` were **hand-authored as a backfill**
