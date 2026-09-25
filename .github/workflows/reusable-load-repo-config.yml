@@ -51,6 +51,15 @@ on:
       github_packages_registry_url:
         description: GitHub Packages npm registry URL (secondary publish target, ASW-323).
         value: ${{ jobs.load.outputs.github_packages_registry_url }}
+      app_client_id:
+        description: GitHub App OAuth client id for changelog write-back (optional).
+        value: ${{ jobs.load.outputs.app_client_id }}
+      bot_name:
+        description: Bot login for changelog git commits (optional).
+        value: ${{ jobs.load.outputs.bot_name }}
+      bot_email:
+        description: Bot noreply email for changelog git commits (optional).
+        value: ${{ jobs.load.outputs.bot_email }}
 
 # Deny all token scopes at the workflow root; the job grants only contents:read.
 permissions: {}
@@ -67,6 +76,9 @@ jobs:
       npm_registry_url: ${{ steps.repo.outputs.npm_registry_url }}
       npm_scope: ${{ steps.repo.outputs.npm_scope }}
       github_packages_registry_url: ${{ steps.repo.outputs.github_packages_registry_url }}
+      app_client_id: ${{ steps.repo.outputs.app_client_id }}
+      bot_name: ${{ steps.repo.outputs.bot_name }}
+      bot_email: ${{ steps.repo.outputs.bot_email }}
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
