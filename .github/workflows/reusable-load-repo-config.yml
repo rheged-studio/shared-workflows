@@ -88,4 +88,4 @@ jobs:
 
       - name: ⚙️ Load repo config
         id: repo
-        uses: rheged-studio/shared-workflows/.github/actions/load-repo-config@950537e9b87ebebef89222a8747331d489d17f65 # v1.5.1
+        uses: rheged-studio/shared-workflows/.github/actions/load-repo-config@42c3de64a5e8c4fc818e0c6534d0375348437374 # v1.8.0
