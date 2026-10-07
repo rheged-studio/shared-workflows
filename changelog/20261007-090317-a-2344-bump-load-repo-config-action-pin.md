@@ -2,10 +2,10 @@
 title: Pin load-repo-config action at v1.8.0 so bot outputs resolve
 release_note: reusable-load-repo-config now actually emits the optional `app_client_id`, `bot_name`, and `bot_email` outputs added in v1.8.0 — they were always empty because the workflow still pinned the pre-A-1927 action.
 created_at: "2026-10-07T09:03:17Z"
-merged_at:
+merged_at: "2026-10-07T10:11:15Z"
 branch: a-2344-bump-load-repo-config-action-pin
-pr:
-commit:
+pr: 125
+commit: 2096d45
 author: rob@rheged.studio
 co_authors: []
 category: fix
@@ -13,9 +13,9 @@ breaking: false
 issues:
   - A-2344
 stats:
-  files_changed:
-  loc_added:
-  loc_removed:
+  files_changed: 2
+  loc_added: 33
+  loc_removed: 1
   commits:
 ---
 
