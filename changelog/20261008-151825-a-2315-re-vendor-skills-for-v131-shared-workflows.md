@@ -2,10 +2,10 @@
 title: Re-vendor agent skills for mattpocock/skills 1.3.1
 release_note: ""
 created_at: "2026-10-08T15:18:25Z"
-merged_at:
+merged_at: "2026-10-08T16:03:57Z"
 branch: a-2315-re-vendor-skills-for-v131-shared-workflows
-pr:
-commit:
+pr: 128
+commit: 91b7d9b
 author: rob@rheged.studio
 co_authors: []
 category: chore
@@ -16,9 +16,9 @@ issues:
 affected_packages:
   - infrastructure
 stats:
-  files_changed:
-  loc_added:
-  loc_removed:
+  files_changed: 121
+  loc_added: 6669
+  loc_removed: 1919
   commits:
 ---
 
