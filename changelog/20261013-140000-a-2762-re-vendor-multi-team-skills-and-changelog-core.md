@@ -2,10 +2,10 @@
 title: Re-vendor multi-team skills, set R and A issue keys, bump changelog-core
 release_note: ""
 created_at: "2026-10-13T14:00:00Z"
-merged_at:
+merged_at: "2026-10-13T13:32:04Z"
 branch: a-2762-shared-workflows-re-vendor-the-multi-team-skills-and
-pr:
-commit:
+pr: 130
+commit: 644ad65
 author: rob@rheged.studio
 co_authors: []
 category: chore
@@ -17,9 +17,9 @@ issues:
 affected_packages:
   - infrastructure
 stats:
-  files_changed:
-  loc_added:
-  loc_removed:
+  files_changed: 81
+  loc_added: 2444
+  loc_removed: 870
   commits:
 ---
 
