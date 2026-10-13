@@ -20,7 +20,7 @@ outputs:
     value: ${{ steps.load.outputs.npm_scope }}
 
   github_packages_registry_url:
-    description: GitHub Packages npm registry URL (secondary publish target, ASW-323).
+    description: GitHub Packages npm registry URL (secondary publish target, R-323).
     value: ${{ steps.load.outputs.github_packages_registry_url }}
 
   app_client_id:
@@ -70,7 +70,7 @@ runs:
         pairs = {}
 
         # Each value is allowlist-validated against its expected shape before it
-        # is written to GITHUB_OUTPUT (ASW-330). These values flow into
+        # is written to GITHUB_OUTPUT (R-330). These values flow into
         # privileged contexts (setup-node registry-url, the GitHub Packages
         # publish target), and an unvalidated value containing a newline could
         # inject additional step outputs. \A..\z anchors (not ^..$) so an

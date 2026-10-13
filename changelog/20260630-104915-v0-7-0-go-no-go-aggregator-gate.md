@@ -5,7 +5,7 @@ version: "0.7.0"
 created_at: "2026-06-30T10:49:15Z"
 category: feature
 breaking: false
-issues: ["A-418"]
+issues: ["R-418"]
 branch: a-418-define-gono-go-aggregator-pattern-integration-pinned-ruleset
 merged_at: "2026-06-30T10:49:15Z"
 commit: 79b6e52

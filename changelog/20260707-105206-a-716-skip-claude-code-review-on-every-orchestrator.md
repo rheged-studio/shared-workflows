@@ -10,7 +10,7 @@ merge_strategy:
 category: feature
 breaking: false
 issues:
-  - A-716
+  - R-716
 stats:
   files_changed:
   loc_added:

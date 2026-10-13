@@ -21,7 +21,7 @@ on:
 
 jobs:
   claude:
-    # Author-association gate (A-313): these triggers run in trusted base-repo
+    # Author-association gate (R-313): these triggers run in trusted base-repo
     # context with secrets available, so restrict to the maintainer set (OWNER /
     # MEMBER / COLLABORATOR). Without this, any public user could fire a
     # privileged run by commenting "@claude".
@@ -47,7 +47,7 @@ jobs:
       # Required: claude-code-action exchanges an OIDC token for its short-lived
       # GitHub token (getOidcToken → setupGitHubToken). Removing it fails the run
       # with "Could not fetch an OIDC token" — it is NOT just for publishing, so
-      # the A-329 least-privilege drop was reverted.
+      # the R-329 least-privilege drop was reverted.
       id-token: write
       actions: read # Required for Claude to read CI results on PRs
     steps:
@@ -60,7 +60,7 @@ jobs:
           persist-credentials: false
 
       - name: 🚦 Guard — CLAUDE_CODE_OAUTH_TOKEN is set
-        # A-646: `required: true` on a workflow_call secret only forces the caller
+        # R-646: `required: true` on a workflow_call secret only forces the caller
         # to MAP the secret (e.g. `secrets: inherit`) — it does NOT guarantee a
         # non-empty VALUE. A consumer inheriting from a repo where the secret is
         # unset passes an empty string that satisfies the schema, then
@@ -72,7 +72,7 @@ jobs:
         run: |
           set -euo pipefail
           if [ -z "${CLAUDE_CODE_OAUTH_TOKEN:-}" ]; then
-            echo "::error::CLAUDE_CODE_OAUTH_TOKEN is empty. Define it as a repository Actions secret in this repo (it is NOT ANTHROPIC_API_KEY, and there is no org-level secret) (A-646)."
+            echo "::error::CLAUDE_CODE_OAUTH_TOKEN is empty. Define it as a repository Actions secret in this repo (it is NOT ANTHROPIC_API_KEY, and there is no org-level secret) (R-646)."
             exit 1
           fi
           echo "OK — CLAUDE_CODE_OAUTH_TOKEN is present."

@@ -5,7 +5,7 @@ version: "1.0.3"
 created_at: "2026-07-03T10:43:50Z"
 category: docs
 breaking: false
-issues: ["A-662"]
+issues: ["R-662"]
 branch: a-662-adopt-floating-caller-tag-pattern-for-the-shared-claude
 merged_at: "2026-07-03T11:02:32Z"
 commit: 7b11c8c
@@ -23,7 +23,7 @@ stats:
 - **Consumer caller stubs now reference the reusable workflows by the floating
   major tag `@v1`** instead of a SHA-pinned caller (`@<sha> # v1.0.2`). New
   non-breaking releases move `v1` forward and land at every consumer's caller
-  automatically, removing the per-release Dependabot SHA-bump churn (A-662). This
+  automatically, removing the per-release Dependabot SHA-bump churn (R-662). This
   is the reusable-workflow **tag exception** to `sha_pinning_required`; true
   `uses:` actions — including `anthropics/claude-code-action` _inside_ the
   reusables — stay SHA-pinned and Dependabot-bumped centrally, so consumers never
@@ -35,7 +35,7 @@ stats:
 - **Introduced the floating `v1` tag** (tracks the latest `v1.x`) and documented
   the per-release "force-move `v1`" step in `changelog/README.md`. A breaking
   change will ship as a new `v2` major and must not move `v1`. The move is manual
-  until A-597 automates the release flow.
+  until R-597 automates the release flow.
 
 The reusable-workflow **job bodies are unchanged** — this release only touches
 reference docs and header comments, so `@v1` behaviour is identical to `v1.0.2`.

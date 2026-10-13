@@ -2,8 +2,8 @@
 title: Set prefix-development on the npm Dependabot ecosystem
 release_note:
 version:
-created_at: '2026-07-28T15:13:50Z'
-merged_at: '2026-07-28T16:06:32Z'
+created_at: "2026-07-28T15:13:50Z"
+merged_at: "2026-07-28T16:06:32Z"
 branch: a-980-dependabot-conventional-commit-templates
 pr: 89
 commit: 301982c
@@ -12,7 +12,7 @@ co_authors: []
 category: chore
 breaking: false
 issues:
-  - A-980
+  - R-980
 stats:
   files_changed: 2
   loc_added: 38
@@ -23,7 +23,7 @@ stats:
 ## Fixed
 
 - The npm ecosystem in `.github/dependabot.yml` set `prefix` but not `prefix-development`
-  ([A-980](https://linear.app/rheged-studio/issue/A-980)), so only production-dependency
+  ([R-980](https://linear.app/rheged-studio/issue/R-980)), so only production-dependency
   bumps were prefixed `chore`. Development-dependency bumps fell back to Dependabot's own
   default subject, which is not a Conventional Commit and would fail the commit gate once it
   becomes a required check.

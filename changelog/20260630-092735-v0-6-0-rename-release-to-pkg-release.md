@@ -5,7 +5,7 @@ version: "0.6.0"
 created_at: "2026-06-30T09:27:35Z"
 category: refactor
 breaking: true
-issues: ["A-543"]
+issues: ["R-543"]
 branch: a-543-pkg-release-rename-the-release-workflow-both-layers
 merged_at: "2026-06-30T09:27:35Z"
 commit: 990abae
@@ -27,7 +27,7 @@ stats:
   `…/.github/workflows/reusable-release.yml@<sha>` must repoint to
   `reusable-pkg-release.yml`. Blast radius was nil — no release tag and no
   consumers existed yet. The filename **is** the npm Trusted Publisher OIDC
-  subject, so it is settled now, before the A-420 fleet rollout.
+  subject, so it is settled now, before the R-420 fleet rollout.
 
 ## Changed
 

@@ -1,15 +1,15 @@
 ---
 title: Pre-GA security review sign-off and reusable-workflow hardening
 release_note: reusable-changelog-enrich.yml now fails fast with a clear message when ROADRUNNER_PRIVATE_KEY is mapped but empty, instead of dying deep inside JWT signing and silently skipping the changelog write-back.
-created_at: '2026-07-15T12:13:04Z'
+created_at: "2026-07-15T12:13:04Z"
 branch: a-422-pre-ga-enforce-sha-pin-policy-security-review-of-shared
 author: rob@acmeskunkworks.io
 co_authors: []
 category: fix
 breaking: false
 issues:
-  - A-422
-merged_at: '2026-07-15T12:39:15Z'
+  - R-422
+merged_at: "2026-07-15T12:39:15Z"
 commit: efa6fca
 pr: 77
 stats:
@@ -20,12 +20,12 @@ stats:
 
 ## Changed
 
-- `reusable-changelog-enrich.yml` gains the [A-646](https://linear.app/rheged-studio/issue/A-646) empty-token guard the two
+- `reusable-changelog-enrich.yml` gains the [R-646](https://linear.app/rheged-studio/issue/R-646) empty-token guard the two
   Claude workflows already carry: a `🚦 Guard` step fails fast when
   `ROADRUNNER_PRIVATE_KEY` is mapped but empty (a `required: true` secret only
   forces the caller to map it, not to supply a non-empty value), rather than
   failing opaquely during App-token minting and silently skipping the write-back
-  ([A-422](https://linear.app/rheged-studio/issue/A-422)).
+  ([R-422](https://linear.app/rheged-studio/issue/R-422)).
 - `reusable-validate-payload.yml` re-pins `actions/checkout` from the stale
   `v4.2.2` to the estate-current `v7.0.0` used by every other workflow — a
   SHA-pin consistency fix.

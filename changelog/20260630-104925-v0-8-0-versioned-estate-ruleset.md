@@ -5,7 +5,7 @@ version: "0.8.0"
 created_at: "2026-06-30T10:49:25Z"
 category: feature
 breaking: false
-issues: ["A-425"]
+issues: ["R-425"]
 branch: a-425-define-version-estate-rulesets-in-shared-workflows
 merged_at: "2026-06-30T10:49:25Z"
 commit: 7f543be

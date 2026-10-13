@@ -1,8 +1,8 @@
 ---
 title: Add reusable-validate-commits.yml base..head commitlint gate
 release_note: New reusable workflow lints every commit in a PR's base..head range against @acme-skunkworks/commitlint-config (floated to latest), under the same no-secrets trust model as the PR-title gate.
-created_at: '2026-07-23T12:10:27Z'
-merged_at: '2026-07-23T13:05:09Z'
+created_at: "2026-07-23T12:10:27Z"
+merged_at: "2026-07-23T13:05:09Z"
 branch: a-981-build-reusable-validate-commitsyml-basehead-commitlint-gate
 pr: 84
 commit: 6ccb2ab
@@ -12,7 +12,7 @@ co_authors: []
 category: feature
 breaking: false
 issues:
-  - A-981
+  - R-981
 stats:
   files_changed: 6
   loc_added: 278
@@ -29,7 +29,7 @@ stats:
   `commitlint --from <base.sha> --to <head.sha>`. Same no-secrets trust model as
   `reusable-validate-pr-title.yml`; no top-level `concurrency:`. Estate-canonical
   status-check context:
-  `commits / Validate commits are Conventional Commits` ([A-981](https://linear.app/rheged-studio/issue/A-981);
+  `commits / Validate commits are Conventional Commits` ([R-981](https://linear.app/rheged-studio/issue/R-981);
   closes [shared-workflows#72](https://github.com/acme-skunkworks/shared-workflows/issues/72)).
 - Inline dogfood of the same steps in `ci.yml`, wired into the `GO/NO GO`
   aggregator (this repo cannot call its own reusables under

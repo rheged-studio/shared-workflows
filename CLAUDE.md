@@ -25,7 +25,7 @@ and dogfood them.
 .github/
 ├── actions/                             # PRODUCT: Layer-1 composite actions (pick-and-mix)
 │   ├── setup-project/                   #   pnpm + Node-from-.nvmrc + store cache
-│   ├── load-repo-config/                #   repo-config.yaml → step outputs (A-779)
+│   ├── load-repo-config/                #   repo-config.yaml → step outputs (R-779)
 │   ├── eslint/ lint-markdown/ lint-yaml/    #   lint mix-ins
 │   ├── build/ typecheck/ test-vitest/ test-bats/  #   build/test mix-ins
 │   ├── shellcheck/ changelog-validate/  #   infra/changelog mix-ins
@@ -34,14 +34,14 @@ and dogfood them.
 │   ├── reusable-claude.yml              # PRODUCT: interactive @claude
 │   ├── reusable-claude-code-review.yml  # PRODUCT: PR review
 │   ├── reusable-validate-pr-title.yml   # PRODUCT: conventional PR title
-│   ├── reusable-validate-commits.yml    # PRODUCT: conventional commits (base..head, A-981)
+│   ├── reusable-validate-commits.yml    # PRODUCT: conventional commits (base..head, R-981)
 │   ├── reusable-lint.yml                # PRODUCT: coarse lint bundle (Layer 2)
 │   ├── reusable-build-test.yml          # PRODUCT: coarse build/test bundle (Layer 2)
 │   ├── reusable-pkg-release.yml         # PRODUCT: build-once → npm OIDC + Packages mirror (Layer 2)
-│   ├── reusable-load-repo-config.yml    # PRODUCT: load infrastructure/repo-config.yaml (Layer 2, A-779)
-│   ├── reusable-changelog-enrich.yml    # PRODUCT: post-merge changelog enrich/finalise (Layer 2, A-793)
+│   ├── reusable-load-repo-config.yml    # PRODUCT: load infrastructure/repo-config.yaml (Layer 2, R-779)
+│   ├── reusable-changelog-enrich.yml    # PRODUCT: post-merge changelog enrich/finalise (Layer 2, R-793)
 │   ├── reusable-validate-payload.yml    # PRODUCT: fan-out payload check (Layer 2)
-│   ├── changelog-enrich.yml             # self-host: post-merge enrich caller (A-800)
+│   ├── changelog-enrich.yml             # self-host: post-merge enrich caller (R-800)
 │   ├── claude.yml                       # self-host: inline @claude on THIS repo
 │   ├── claude-code-review.yml           # self-host: inline PR review on THIS repo
 │   └── ci.yml                           # self-CI: actionlint + yamllint + markdownlint + inline PR-title + commits
@@ -60,14 +60,14 @@ and dogfood them.
 - **Permissions** are declared in the reusable job and are capped by the
   caller/org token settings. `id-token: write` on the Claude workflows is
   **required** for claude-code-action's OIDC token exchange — do not drop it
-  (A-329).
+  (R-329).
 - **`paths-ignore`** cannot be set on `workflow_call`, so the Claude review's
   paths-ignore lives in the caller stub.
 - **Top-level `concurrency:` must NOT appear in a `reusable-*.yml`.** A called
   reusable runs as the caller's job, so a workflow-level concurrency group
   resolves to the same value the caller declares and GitHub deadlock-cancels the
   run at startup ("a deadlock was detected … between a top level workflow and
-  '<job>'"). It is invisible to `actionlint` and to the REST API (A-621), so a
+  '<job>'"). It is invisible to `actionlint` and to the REST API (R-621), so a
   guard step in `ci.yml` fails the build if any `reusable-*.yml` reintroduces
   one. Concurrency lives in the **caller stub**, where the trigger sits; the
   inline self-hosted copies (`claude-code-review.yml`, `ci.yml`) keep theirs
@@ -84,16 +84,16 @@ and dogfood them.
   resolves. `reusable-lint.yml` pins these to the **`v0.8.0`** tag's SHA
   (`@7f543bef1… # v0.8.0`) — the first release whose tag carries every composite
   action; Dependabot bumps it like any other tag pin. (The full release history
-  was backfilled in A-585: `v0.1.0`–`v0.8.0` plus the `v1.0.0` stable release.)
+  was backfilled in R-585: `v0.1.0`–`v0.8.0` plus the `v1.0.0` stable release.)
 
-## The pkg-release workflow (`reusable-pkg-release.yml`, A-417)
+## The pkg-release workflow (`reusable-pkg-release.yml`, R-417)
 
 `reusable-pkg-release.yml` ports the estate's hardened release flow (build-once →
 npm OIDC Trusted Publishing → GitHub Packages mirror → tag + GitHub release;
-A-328/326/323) into a `workflow_call`. It is named **`pkg-release`** everywhere
+R-328/326/323) into a `workflow_call`. It is named **`pkg-release`** everywhere
 (this Layer-2 file `reusable-pkg-release.yml`; each consumer's caller stub
 `pkg-release.yml`) to mark it a _package_ release — an npm publish, not an app
-deployment (A-543). Unlike the lint/build-test bundles it publishes, so it
+deployment (R-543). Unlike the lint/build-test bundles it publishes, so it
 carries some unique rules:
 
 - **No `secrets:` block.** The npm leg authenticates via OIDC Trusted Publishing
@@ -110,17 +110,17 @@ carries some unique rules:
   estate rollout.
 - **Consumer prerequisite — branch-protected `npm-release` environment.** A
   reusable workflow's `environment:` resolves in the **caller** repo; each
-  consumer must define `npm-release` restricted to the release branch (A-326).
+  consumer must define `npm-release` restricted to the release branch (R-326).
   If it is absent GitHub silently auto-creates it **unprotected**, losing the ref
   gate — so it is a hard prerequisite, not a default.
 - **Caller owns the trigger; no `workflow_dispatch`.** `workflow_call` cannot own
   `on: push`/`concurrency`; the caller sets push-to-`main` +
   `cancel-in-progress: false` and must **not** add `workflow_dispatch` — a
   dispatched run satisfies the same npm OIDC subject as a legitimate post-merge
-  push and could publish a poisoned tarball with valid provenance (A-326).
+  push and could publish a poisoned tarball with valid provenance (R-326).
 - **The two publish scripts are inlined** (not the consumer's per-repo
   `infrastructure/scripts/publish-*.sh`), centralising the logic and killing the
-  drift A-384 targets. The `load-repo-config` outputs the caller stub reads
+  drift R-384 targets. The `load-repo-config` outputs the caller stub reads
   via `reusable-load-repo-config.yml@v1` (registries, scope, node-version file)
   become `with:` inputs instead.
 - **Build reuses Layer-1** `setup-project` + `build`; the publish legs are
@@ -132,7 +132,7 @@ carries some unique rules:
   or bundle-only consumer with no `build` script (markdownlint-config, agent-skills)
   passes `build: false` — else the build step fails `ERR_PNPM_NO_SCRIPT`. `npm pack`
   still packs the tarball from the package sources regardless.
-- **The mirror has its own gate, `mirror_publish` (A-457).** The npm leg's
+- **The mirror has its own gate, `mirror_publish` (R-457).** The npm leg's
   `should_publish` is the version-vs-tag check — and the `release` job **creates
   that tag**, so it is false for that version for ever afterwards. Gating the
   mirror on it meant a mirror-only failure could never be retried: the job was
@@ -169,17 +169,17 @@ reusable workflows stay few and pay setup once. See `.github/actions/README.md`.
 
 - Each action takes plain `with:` inputs; in the reusable workflows those are
   fed from each consumer's `repo-config.yaml` via the caller's
-  `reusable-load-repo-config.yml@v1` job (A-779 — the composite is SHA-pinned
+  `reusable-load-repo-config.yml@v1` job (R-779 — the composite is SHA-pinned
   inside that reusable; consumers float the workflow, not the action).
   Composite actions inherit the calling job's permissions.
 - `lint-yaml` injects **this repo's own** `.yamllint.yml` (resolved relative to
-  `github.action_path`) so consumers carry no local copy (A-438). The root file
+  `github.action_path`) so consumers carry no local copy (R-438). The root file
   stays the single source of truth — keep it in sync, don't fork a copy.
 - Tool versions/pins (pnpm, Node, yamllint, actionlint) **mirror `ci.yml`** so the
   dogfooded self-CI and the shipped actions never drift. Keep them aligned.
 - **This repo does not dogfood the actions via `uses:`** — same
   `sha_pinning_required` reason as the inline workflows below. They are authored
-  here and consumed cross-repo by `@<sha>`; Layer 2 (A-415/416) wires them.
+  here and consumed cross-repo by `@<sha>`; Layer 2 (R-415/416) wires them.
 
 ### Why the PR-title and commits checks are inline (and there are no `./` callers)
 
@@ -205,18 +205,18 @@ caller stubs pointing at the `reusable-*` versions. The stock output of
 `/install-github-app` (floating `@v4`/`@v1` tags, no author-association gate)
 won't even start here — `sha_pinning_required` rejects unpinned actions — so
 these inline copies port the hardened `reusable-claude*.yml` bodies verbatim:
-SHA-pinned actions, the A-313 author-association gate, `persist-credentials:
+SHA-pinned actions, the R-313 author-association gate, `persist-credentials:
 false`, timeouts and review concurrency. The `workflow_call` `inputs` become
 literals and the review's `paths-ignore` (invalid on `workflow_call`) moves onto
-the real `pull_request` trigger. Both also carry the A-646 empty-token guard step
+the real `pull_request` trigger. Both also carry the R-646 empty-token guard step
 (a `🚦 Guard` that fails fast when `CLAUDE_CODE_OAUTH_TOKEN` is empty — the
 required secret is that token, **not** `ANTHROPIC_API_KEY`), and the review copy
-carries the A-646 `github.actor != 'dependabot[bot]'` skip (a Dependabot run can't
+carries the R-646 `github.actor != 'dependabot[bot]'` skip (a Dependabot run can't
 read Actions secrets, so it would authenticate with an empty token). **Keep these
 in sync with their `reusable-*` counterparts** — same rule as the inline
 PR-title / commits gates.
 
-### Status-check context (A-400 / A-405)
+### Status-check context (R-400 / R-405)
 
 `reusable-validate-pr-title.yml`'s job is named
 `Validate PR title is a Conventional Commit`. A reusable-workflow check renders
@@ -236,7 +236,7 @@ Third-party actions are SHA-pinned with a `# vX.Y.Z` comment (estate policy);
 Dependabot bumps them weekly (grouped). Keep the same discipline when adding or
 updating any `uses:` line.
 
-## Releasing this repo (A-597)
+## Releasing this repo (R-597)
 
 This repo publishes **no npm package** — a "release" is a `vX.Y.Z` git tag + a
 GitHub Release over the reusable workflows and composite actions. The flow is
@@ -249,7 +249,7 @@ release-orchestrator target.
   and, on merge, cuts the `vX.Y.Z` tag + GitHub Release. It does **not** write a
   root `CHANGELOG.md` — the dated [`changelog/`](changelog/) entries remain the
   curated human record.
-- **`group-pull-request-title-pattern` is mandatory (A-677).** With
+- **`group-pull-request-title-pattern` is mandatory (R-677).** With
   `separate-pull-requests: false` release-please titles the combined release PR
   from its _group_ pattern, whose default (`chore: release main`) carries no
   `${version}`/`${component}`. The orchestrator's `release-please github-release`
@@ -260,20 +260,20 @@ release-orchestrator target.
   as a prerequisite in the orchestrator's onboarding docs. It does **not** affect
   the tag (`include-component-in-tag: false` keeps tags bare `vX.Y.Z`).
 - **`move-floating-major.yml`** force-moves the floating major tag (`v1`, …) onto
-  each release commit — shared-workflows-specific (consumers pin `@v1`, A-662),
+  each release commit — shared-workflows-specific (consumers pin `@v1`, R-662),
   which octavo has no equivalent of.
-- **Release cutover (A-597) — complete.** Clacks now
+- **Release cutover (R-597) — complete.** Clacks now
   drives release-please for this repo as a `kind: deploy` target (its
   `orchestrate-releases.yml` matrix); on a releasable merge it maintains the
   release PR and cuts the `vX.Y.Z` tag + GitHub Release directly from the
-  manifest (A-677), after which `move-floating-major.yml` force-moves `@v1`. The
+  manifest (R-677), after which `move-floating-major.yml` force-moves `@v1`. The
   interim in-repo `release-please.yml` that bootstrapped the flow has been
   **deleted**, and `GO/NO GO` is now the single required check on `main`. Forward
   changelog authoring is live (`send-it` `changelog: true` + the `changelog`
   skill), and **post-merge enrichment runs in-repo** via
   [`changelog-enrich.yml`](.github/workflows/changelog-enrich.yml) →
   `reusable-changelog-enrich.yml` (`mode: enrich`) — **not** the retired central
-  `enrich-changelogs.yml` cron (deleted in A-801; enrichment moved into each
+  `enrich-changelogs.yml` cron (deleted in R-801; enrichment moved into each
   repo).
 
 ## Commands
@@ -307,17 +307,17 @@ issue keys). The installed skills are:
 - **`/triage-pr`** — drive a draft PR with failing CI to merge-ready: fix in-scope CI
   failures, then action unresolved AI review feedback.
 
-This repo runs the shared **`changelog`** flow (A-597): the `changelog` skill is
+This repo runs the shared **`changelog`** flow (R-597): the `changelog` skill is
 installed, `send-it` authors a dated `changelog/` entry per branch
 (`changelog: true` in its `config.json`), and CI validates entries against the
 contract via the `📓 Changelog` job in the `GO/NO GO` aggregator. Post-merge
-enrichment lives in `reusable-changelog-enrich.yml` (A-793 / A-821 / A-1927) —
+enrichment lives in `reusable-changelog-enrich.yml` (R-793 / R-821 / R-1927) —
 consumers call it with `secrets: inherit` (Rheged road-runner defaults) or map
 `APP_PRIVATE_KEY` plus bot/App `with:` inputs for other bots; the job mints a
 GitHub App installation token and pushes `changelog/**` (ADR 0004; Actions
 cannot be a Trunk bypass actor — bypass actor must match the configured bot).
 This repo's own caller is
-`.github/workflows/changelog-enrich.yml` (`mode: enrich`, A-800).
+`.github/workflows/changelog-enrich.yml` (`mode: enrich`, R-800).
 
 ## Linting and formatting
 
@@ -341,7 +341,7 @@ apparatus — it holds workflows, not a published package, so CI installs
   isn't installed).
 - **commit-msg** — strips `Co-Authored-By: Claude … <noreply@anthropic.com>`
   trailers (Claude is tooling, not a contributor).
-- **pre-push** — blocks direct pushes to `main` (open a PR instead) and runs A-1023 also runs a best-effort `commitlint --from origin/main --to HEAD` range check, skipping with an install hint when `@commitlint/cli` or `origin/main` is missing; CI’s reusable commit-validation workflow remains authoritative. Configuration is `commitlint.config.mjs`, extending `@rheged-studio/commitlint-config`.
+- **pre-push** — blocks direct pushes to `main` (open a PR instead) and runs R-1023 also runs a best-effort `commitlint --from origin/main --to HEAD` range check, skipping with an install hint when `@commitlint/cli` or `origin/main` is missing; CI’s reusable commit-validation workflow remains authoritative. Configuration is `commitlint.config.mjs`, extending `@rheged-studio/commitlint-config`.
   yamllint + actionlint as the last gate before CI. Bot identities bypass.
 
 Hooks are dormant in CI: `HUSKY=0` is set on the only job that runs
@@ -363,9 +363,9 @@ gitignored).
 
 ## Git / PR flow
 
-**Dual merge policy (A-1176 / A-1175 / A-1177):** feature / ship PRs land as
+**Dual merge policy (R-1176 / R-1175 / R-1177):** feature / ship PRs land as
 **merge commits**; release-please version PRs and fan-out PRs stay **squash**.
-Both `allow_merge_commit` and `allow_squash_merge` remain enabled (A-1177 owns
+Both `allow_merge_commit` and `allow_squash_merge` remain enabled (R-1177 owns
 flipping the estate allow-flags / ruleset — not this docs change).
 
 The PR title must still be a Conventional Commit (inline `pr-title` job in
@@ -376,7 +376,7 @@ Every commit on a PR branch is linted (inline `commits` job; consumers use
 history merges intact.
 Never push to `main` directly — branch and open a PR.
 
-### CodeRabbit review + the `skip-review` label (A-667)
+### CodeRabbit review + the `skip-review` label (R-667)
 
 CodeRabbit (a separate SaaS bot from the Claude review workflows) auto-reviews
 every PR and shares a fair-usage quota. Estate-wide fan-outs open half a dozen
@@ -405,9 +405,9 @@ re-sync PRs opened with `--label skip-review` — belongs to the private
 `release-orchestrator` (it already holds the cross-repo `road-runner-bot`
 credential), **not** this repo, which has no cross-repo write capability by
 design. Agent-facing guidance for agents to apply the label will live in the
-estate's shared `AGENTS.md` once A-668 ships.
+estate's shared `AGENTS.md` once R-668 ships.
 
-#### Claude Code Review honours the same label (A-716)
+#### Claude Code Review honours the same label (R-716)
 
 The `skip-review` label is cross-bot: `reusable-claude-code-review.yml`'s job
 `if:` also skips a PR carrying it (alongside its existing draft / `release-please--`
@@ -417,9 +417,9 @@ CodeRabbit SaaS review and the Claude Code Review workflow. The
 rollouts and changelog-enrichment PRs alike — so neither bot spends quota on an
 unattended, auto-merging PR that carries no new behaviour.
 
-#### The estate review profile is more than the denylist (A-732 / A-778)
+#### The estate review profile is more than the denylist (R-732 / R-778)
 
-`.coderabbit.yaml` is **repo-owned** (A-778 removed the verbatim fan-out). This
+`.coderabbit.yaml` is **repo-owned** (R-778 removed the verbatim fan-out). This
 repo's copy is the estate reference profile; consumers carry their own identical
 (or deliberately drifted) copies. Keep this file a **strict superset** of every
 skip convention — anything omitted reverts a consumer that re-syncs from it to
@@ -428,7 +428,7 @@ CodeRabbit's own defaults. Beyond the `skip-review` denylist it carries:
 - **`language: "en-GB"`** — review prose in British English, matching house style.
 - **`reviews.profile: "chill"`** — a balanced signal-to-noise default (fewer
   nitpicks than `assertive`, more than `quiet`).
-- **`reviews.high_level_summary_in_walkthrough: true`** (A-1102) — keeps the
+- **`reviews.high_level_summary_in_walkthrough: true`** (R-1102) — keeps the
   high-level summary but places it in the walkthrough comment instead of the PR
   description. Description edits re-fire `pull_request.edited` and waste a full
   CI run for an unchanged SHA; comments do not. Consumers that omit this key

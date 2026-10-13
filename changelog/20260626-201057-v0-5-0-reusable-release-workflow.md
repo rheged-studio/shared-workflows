@@ -5,7 +5,7 @@ version: "0.5.0"
 created_at: "2026-06-26T20:10:57Z"
 category: feature
 breaking: false
-issues: ["A-417"]
+issues: ["R-417"]
 branch: sk-417-reusable-releaseyml-workflow
 merged_at: "2026-06-26T20:10:57Z"
 commit: 18e081c

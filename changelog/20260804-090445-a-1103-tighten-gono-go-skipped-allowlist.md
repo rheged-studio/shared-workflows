@@ -1,8 +1,8 @@
 ---
 title: Tighten the GO/NO GO verdict's blanket skipped acceptance
 release_note: The canonical GO/NO GO verdict now allowlists skipped only on release-please--* branches, so an all-skipped needs set can no longer mint a green gate with no CI behind it.
-created_at: '2026-08-04T09:04:45Z'
-merged_at: '2026-08-04T09:18:33Z'
+created_at: "2026-08-04T09:04:45Z"
+merged_at: "2026-08-04T09:18:33Z"
 branch: a-1103-tighten-the-gono-go-verdicts-blanket-skipped-acceptance
 pr: 98
 commit: 99afec0
@@ -11,7 +11,7 @@ co_authors: []
 category: fix
 breaking: false
 issues:
-  - A-1103
+  - R-1103
 stats:
   files_changed: 3
   loc_added: 76
@@ -21,7 +21,7 @@ stats:
 
 ## Fixed
 
-- **`.github/workflows/ci.yml` ([A-1103](https://linear.app/rheged-studio/issue/A-1103))** —
+- **`.github/workflows/ci.yml` ([R-1103](https://linear.app/rheged-studio/issue/R-1103))** —
   the dogfooded `GO/NO GO` verdict now allowlists `skipped` only when
   `github.head_ref` matches `release-please--*`; everywhere else every needed
   job must report `success`. Previously a blanket `success or skipped` accept
