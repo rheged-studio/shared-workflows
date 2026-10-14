@@ -1,15 +1,15 @@
 ---
 title: Share load-repo-config via reusable @v1
 release_note: Consumers can float reusable-load-repo-config.yml@v1 instead of keeping a duplicated local load-repo-config composite; the action is SHA-pinned inside the reusable.
-created_at: '2026-07-10T17:10:58Z'
+created_at: "2026-07-10T17:10:58Z"
 branch: a-779-move-load-repo-config-into-shared-workflows-reference-at-v1
 author: rob@acmeskunkworks.io
 co_authors: []
 category: feature
 breaking: false
 issues:
-  - A-779
-merged_at: '2026-07-10T17:28:07Z'
+  - R-779
+merged_at: "2026-07-10T17:28:07Z"
 commit: 8506eca
 pr: 70
 stats:
@@ -26,7 +26,7 @@ stats:
 - Layer-2 `reusable-load-repo-config.yml` — checkout + SHA-pinned composite;
   exposes all five config knobs as `workflow_call` outputs so callers float
   `@v1` without fighting `sha_pinning_required` on the action itself
-  ([A-779](https://linear.app/rheged-studio/issue/A-779)).
+  ([R-779](https://linear.app/rheged-studio/issue/R-779)).
 
 ## Changed
 

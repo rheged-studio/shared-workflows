@@ -1,15 +1,15 @@
 name: Reusable / Validate fanned payload
 
-# Reusable (workflow_call) version of the estate's fan-out PAYLOAD check (A-738).
+# Reusable (workflow_call) version of the estate's fan-out PAYLOAD check (R-738).
 #
-# The Clacks fan-out spine (A-711) accepts `mergeable_state:
-# unstable` as mergeable — it must, so a skipped review bot (A-396) doesn't wedge
+# The Clacks fan-out spine (R-711) accepts `mergeable_state:
+# unstable` as mergeable — it must, so a skipped review bot (R-396) doesn't wedge
 # the merge. But that means a consumer whose ONLY required checks are the
 # `GO/NO GO` aggregator and `pr-title` has NOTHING validating the fanned payload
 # itself: a broken `.claude/skills/**` bundle or an unparseable `.coderabbit.yaml`
 # keeps those green, reaches `unstable`, and the spine merges (and, on octavo,
 # deploys) it. This workflow is the payload-exercising REQUIRED check that closes
-# that A-714 trap — a malformed payload fails it, the state becomes `blocked`
+# that R-714 trap — a malformed payload fails it, the state becomes `blocked`
 # (not `unstable`), and the spine refuses to merge.
 #
 # What it validates is DECLARED by the caller, never auto-detected — a required
@@ -17,7 +17,7 @@ name: Reusable / Validate fanned payload
 # exists to close. A skills consumer sets `skills: true` (the bundle MUST be
 # present and well-formed); a CodeRabbit consumer sets `coderabbit: true` (the
 # config MUST be present and parse). The caller stub is **repo-owned** one-time
-# onboarding state (A-780) — not fanned by the orchestrator; set the inputs from
+# onboarding state (R-780) — not fanned by the orchestrator; set the inputs from
 # the repo's install profile when placing the stub.
 #
 # STATUS-CHECK CONTEXT: the job below is named `Validate fanned payload` — the
@@ -30,12 +30,12 @@ name: Reusable / Validate fanned payload
 # The validator is a zero-dependency Node script inlined here (no consumer
 # toolchain / setup-project needed — a broken payload must fail EVEN IF it also
 # breaks the repo's own install). YAML parsing for `.coderabbit.yaml` uses
-# `npx -y js-yaml` (a parse is the schema-parse gate A-738 asks for; an invalid
+# `npx -y js-yaml` (a parse is the schema-parse gate R-738 asks for; an invalid
 # document exits non-zero). A reusable workflow cannot reach a sibling local
 # action (`./` resolves against the caller — see reusable-lint.yml), so inlining
 # avoids a cross-repo action-checkout dance.
 #
-# REQUIRED CALLER PERMISSIONS (A-621): under the org default read-only token this
+# REQUIRED CALLER PERMISSIONS (R-621): under the org default read-only token this
 # job needs only `contents: read`, which the default covers; declare it in the
 # caller stub anyway (a `permissions:` block resets every other scope to none).
 #
@@ -91,7 +91,7 @@ jobs:
       - name: 🚫 Validate check selection
         # A caller that requires NEITHER payload would check out, validate nothing
         # and exit green — the exact green-but-blind pass this check exists to
-        # prevent (A-445 / A-714). Fail fast before doing any work.
+        # prevent (R-445 / R-714). Fail fast before doing any work.
         if: ${{ !inputs.skills && !inputs.coderabbit }}
         run: |
           echo "::error::validate-payload called with skills=false and coderabbit=false — nothing to validate. Set at least one to true, or drop the caller."
@@ -113,7 +113,7 @@ jobs:
           // names the skill (`name:` — the one field the Agent Skills spec makes
           // mandatory). A missing/empty/frontmatter-less SKILL.md is the signature
           // of a broken vendor (e.g. an install that wrote only config.json — the
-          // A-745 failure). Version is NOT required: meta bundles like
+          // R-745 failure). Version is NOT required: meta bundles like
           // skill-creator / find-skills are legitimately unversioned.
           const frontmatterRe = /^---\n([\s\S]*?)\n---/;
           const nameRe = /^name:\s*\S/m;
@@ -182,7 +182,7 @@ jobs:
             echo "::error::coderabbit=true but .coderabbit.yaml is absent — the payload is missing."
             exit 1
           fi
-          # A YAML parse IS the schema-parse gate A-738 asks for: an invalid document
+          # A YAML parse IS the schema-parse gate R-738 asks for: an invalid document
           # raises. Use python3 + PyYAML — both preinstalled on the ubuntu runner; a
           # `pip install` fallback keeps the check from false-blocking a consumer if a
           # future image ever drops PyYAML. (js-yaml's v4 CLI was removed and

@@ -5,7 +5,7 @@ version: "0.4.0"
 created_at: "2026-06-26T16:23:59Z"
 category: feature
 breaking: false
-issues: ["A-416"]
+issues: ["R-416"]
 branch: sk-416-reusable-build-testyml-workflow
 merged_at: "2026-06-26T16:23:59Z"
 commit: d0a5949

@@ -8,7 +8,7 @@ This repository is the estate's home for **reusable GitHub Actions workflows**
 The full design rationale lives in
 [ADR 0001 §D5/§D6](docs/adr/0001-shared-ci-architecture-for-npm-packages.md); the pre-GA
 review that signed this surface off is
-[`docs/security-review-a422.md`](docs/security-review-a422.md) (A-422).
+[`docs/security-review-a422.md`](docs/security-review-a422.md) (R-422).
 
 ## Reporting a vulnerability
 
@@ -39,7 +39,7 @@ superseded majors.
   under `sha_pinning_required`, so consumer caller stubs pin `@v1` and receive shared-code
   changes when the release orchestrator moves the `v1` tag onto a released commit. That
   moved code has already passed this repo's own `GO/NO GO` gate and review; consumers
-  wanting change-review-per-bump may pin `@<sha>` instead. See ADR 0001 and A-662.
+  wanting change-review-per-bump may pin `@<sha>` instead. See ADR 0001 and R-662.
 - **Least-privilege permissions.** Every `reusable-*.yml` sets root `permissions: {}` and
   grants each job only the scopes it needs. `id-token: write` is confined to the two publish
   legs of `reusable-pkg-release.yml` and the OIDC-using Claude workflows.
@@ -67,9 +67,9 @@ registers its own caller filename as the npmjs.com Trusted Publisher.
 
 `main` is the only protected branch. Human and consumer-token changes never push to it
 directly — they land via a PR, gated on the integration-pinned `GO/NO GO` check.
-**Dual merge policy (A-1176 / A-1175 / A-1177):** feature / ship PRs use **merge
+**Dual merge policy (R-1176 / R-1175 / R-1177):** feature / ship PRs use **merge
 commits**; release-please version PRs and fan-out PRs stay **squash**; both
-`allow_merge_commit` and `allow_squash_merge` remain enabled (A-1177 owns the
+`allow_merge_commit` and `allow_squash_merge` remain enabled (R-1177 owns the
 estate allow-flag / ruleset flip). The **one** exception to the PR path is
 approved, gated App-identity automation running under the road-runner-bot App
 (post-merge `changelog/**` write-back and release commits/tags), which holds an

@@ -5,7 +5,7 @@ version: "1.0.2"
 created_at: "2026-07-01T11:41:33Z"
 category: fix
 breaking: false
-issues: ["A-624"]
+issues: ["R-624"]
 branch: a-624-reusable-pkg-release-add-build-optout
 merged_at: "2026-07-01T11:41:33Z"
 commit: 9febdb1
@@ -40,4 +40,4 @@ stats:
 
 Build-less publishers bump their `pkg-release.yml` caller to the `v1.0.2` SHA and
 pass `with: { build: false }`. This release includes everything in `v1.0.1` (the
-A-621 claude-review deadlock + caller-permissions fixes).
+R-621 claude-review deadlock + caller-permissions fixes).

@@ -1,6 +1,6 @@
 name: Changelog enrich
 
-# Post-merge dated-changelog enrich for this deploy target (A-800 / A-821).
+# Post-merge dated-changelog enrich for this deploy target (R-800 / R-821).
 # Never pull_request_target. App-token write-back requires secrets: inherit.
 on:
   push:

@@ -11,7 +11,7 @@ co_authors: []
 category: fix
 breaking: false
 issues:
-  - A-1346
+  - R-1346
 stats:
   files_changed: 8
   loc_added: 69
@@ -22,7 +22,7 @@ version:
 
 ## Fixed
 
-**Bump shared @acme-skunkworks packages and clear markdownlint 3.x fallout ([A-1346](https://linear.app/rheged-studio/issue/A-1346))**
+**Bump shared @acme-skunkworks packages and clear markdownlint 3.x fallout ([R-1346](https://linear.app/rheged-studio/issue/R-1346))**
 
 - Bump `@acme-skunkworks/changelog-core` to `^1.1.1`, `commitlint-config` to `^1.0.1`, and `markdownlint-config` to `^3.0.0`.
 - Ignore vendored `.claude/skills/**` / `.agents/skills/**` and fan-out `AGENTS.md` in markdownlint config and `lint:md` globs so skill bundles stay byte-identical to upstream.

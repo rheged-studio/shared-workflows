@@ -10,12 +10,12 @@ GitHub release** over the reusable workflows and composite actions, nothing more
 Each entry carries a `version` tying it to the tag it shipped in, and the GitHub
 release notes are sourced from the matching entry's body.
 
-**Releases are automated (A-597).** The private release-orchestrator drives
+**Releases are automated (R-597).** The private release-orchestrator drives
 release-please for this repo as a `kind: deploy` target: it maintains a release
 PR from the Conventional-Commit history, and merging it bumps
 [`package.json`](../package.json) + [`.release-please-manifest.json`](../.release-please-manifest.json)
 and cuts the annotated `vX.Y.Z` tag and its GitHub Release from the manifest.
-Consumers pin their callers to `@v1` (A-662), so
+Consumers pin their callers to `@v1` (R-662), so
 [`move-floating-major.yml`](../.github/workflows/move-floating-major.yml) then
 force-moves the floating major tag onto the release commit — otherwise the
 release would never reach `@v1` consumers.
@@ -29,7 +29,7 @@ A breaking change ships as `v2` (a new floating major) and must **not** move `v1
 `move-floating-major.yml` handles this — it only ever touches the release's own
 major tag.
 
-> **Post-merge enrichment (A-793 / A-821).** These entries are filled in after
+> **Post-merge enrichment (R-793 / R-821).** These entries are filled in after
 > merge with their `merged_at` / `commit` / `pr` / `stats` fields by the in-repo
 > [`changelog-enrich.yml`](../.github/workflows/changelog-enrich.yml) workflow
 > (`mode: enrich`), which pushes only `changelog/**` back to `main` as the
@@ -37,7 +37,7 @@ major tag.
 > post-merge fields until that workflow runs.
 
 The entries up to and including `v1.0.0` were **hand-authored as a backfill**
-(A-585), reconstructing the project's history from its merged PRs. Forward entries
+(R-585), reconstructing the project's history from its merged PRs. Forward entries
 follow the same schema.
 
 ## File naming
@@ -73,7 +73,7 @@ author: "you@example.com"
 co_authors: []
 category: feature # feature | fix | chore | docs | refactor | perf
 breaking: false
-issues: ["A-418"] # Linear issue IDs
+issues: ["R-418"] # Linear issue IDs
 affected_packages: [] # this repo ships no packages — stays empty
 stats: # post-merge; filled by enrichment
   files_changed:

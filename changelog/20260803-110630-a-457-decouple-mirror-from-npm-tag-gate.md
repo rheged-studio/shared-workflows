@@ -1,8 +1,8 @@
 ---
 title: Give the GitHub Packages mirror its own publish gate
 release_note: A GitHub Packages mirror failure can now be retried by re-running the release run — previously the mirror job was skipped for good once the npm leg had tagged the release, silently leaving the version on npm but never on GitHub Packages.
-created_at: '2026-08-03T11:06:30Z'
-merged_at: '2026-08-03T11:20:39Z'
+created_at: "2026-08-03T11:06:30Z"
+merged_at: "2026-08-03T11:20:39Z"
 branch: a-457-pkg-release-decouple-the-github-packages-mirror-from-the-npm
 pr: 92
 commit: 2cf5a7d
@@ -12,7 +12,7 @@ co_authors: []
 category: fix
 breaking: false
 issues:
-  - A-457
+  - R-457
 stats:
   files_changed: 3
   loc_added: 198
@@ -56,7 +56,7 @@ bits_ under an already-published version — desyncing the two registries by
 content rather than by presence, which is worse than the gap being repaired.
 
 Deferring tag creation until after the mirror — the fix originally proposed on
-[A-457](https://linear.app/rheged-studio/issue/A-457) — was rejected. The tag's existence is what flips a merged release PR from
+[R-457](https://linear.app/rheged-studio/issue/R-457) — was rejected. The tag's existence is what flips a merged release PR from
 `autorelease: pending` to `autorelease: tagged`, and until that flip
 `release-please release-pr` aborts for the repo and opens no further release
 PRs. A mirror hiccup would have stalled the package's releases entirely rather

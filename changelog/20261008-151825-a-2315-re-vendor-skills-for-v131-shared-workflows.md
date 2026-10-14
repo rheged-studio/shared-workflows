@@ -11,8 +11,8 @@ co_authors: []
 category: chore
 breaking: false
 issues:
-  - A-2315
-  - A-2299
+  - R-2315
+  - R-2299
 affected_packages:
   - infrastructure
 stats:
@@ -24,9 +24,9 @@ stats:
 
 ## Changed
 
-**Re-vendor shared-workflows onto the estate skill catalogue ([A-2315](https://linear.app/rheged-studio/issue/A-2315), parent [A-2299](https://linear.app/rheged-studio/issue/A-2299))**
+**Re-vendor shared-workflows onto the estate skill catalogue ([R-2315](https://linear.app/rheged-studio/issue/R-2315), parent [R-2299](https://linear.app/rheged-studio/issue/R-2299))**
 
 - Roll `.claude/skills` and `.agents/skills` via `fleet-update.mjs --apply` (Rheged ship set plus Matt Pocock 1.3.1 packs)
 - Add `implement-spec`, `retro`, and Rheged `pr`; drop upstream-removed `resolving-merge-conflicts`
-- Restore per-skill `config.json` from trunk ([A-706](https://linear.app/rheged-studio/issue/A-706)); set triage-pr `humanEnvelope` false and `followUpLabel` `follow-up` on both mirrors
+- Restore per-skill `config.json` from trunk ([R-706](https://linear.app/rheged-studio/issue/R-706)); set triage-pr `humanEnvelope` false and `followUpLabel` `follow-up` on both mirrors
 - Refresh `skills-lock.json` / `.claude/skills.lock` provenance to GitHub sources

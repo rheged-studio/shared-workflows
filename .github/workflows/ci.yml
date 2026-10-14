@@ -19,10 +19,10 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  # A-1100 / A-1101: never cancel a RUNNING run. A superseded run's `needs` all
+  # R-1100 / R-1101: never cancel a RUNNING run. A superseded run's `needs` all
   # report `cancelled`, the always() aggregator below still executes, and its
-  # verdict mints a FALSE RED `GO/NO GO` — the one check the A-419 orchestrator
-  # polls and the A-425 ruleset requires. A red meaning "superseded" is
+  # verdict mints a FALSE RED `GO/NO GO` — the one check the R-419 orchestrator
+  # polls and the R-425 ruleset requires. A red meaning "superseded" is
   # indistinguishable from a red meaning "broken", which trains reviewers to
   # discount the gate.
   #
@@ -34,7 +34,7 @@ concurrency:
   # Do NOT "fix" this by relaxing the verdict instead: see the aggregator's own
   # comment for why `cancelled` must stay red and `!cancelled()` is a bypass.
   #
-  # Subsumes A-961 (a cancelled release-please run cancelling the gate the
+  # Subsumes R-961 (a cancelled release-please run cancelling the gate the
   # orchestrator waits on), so the narrower
   # `github.head_ref != 'release-please--branches--main'` carve-out is not
   # needed here — this covers every branch, not just the release one.
@@ -47,7 +47,7 @@ jobs:
   pr-title:
     # Mirrors reusable-validate-pr-title.yml so this repo gates its own PRs the
     # same way consumers will. The job name is the estate-canonical status-check
-    # string (A-400/405) — keep it stable.
+    # string (R-400/405) — keep it stable.
     name: Validate PR title is a Conventional Commit
     runs-on: ubuntu-latest
     permissions:
@@ -74,9 +74,9 @@ jobs:
             revert
 
   commits:
-    # Mirrors reusable-validate-commits.yml (A-981) so this repo gates its own
+    # Mirrors reusable-validate-commits.yml (R-981) so this repo gates its own
     # PRs the same way consumers will. The job name is the estate-canonical
-    # status-check string (A-400/405) — keep it stable.
+    # status-check string (R-400/405) — keep it stable.
     name: Validate commits are Conventional Commits
     runs-on: ubuntu-latest
     permissions:
@@ -154,7 +154,7 @@ jobs:
           ./actionlint -color
 
       - name: 🚦 Guard — no top-level concurrency in reusables
-        # A-621: a reusable (`workflow_call`) runs as the CALLER's job, so a
+        # R-621: a reusable (`workflow_call`) runs as the CALLER's job, so a
         # workflow-level `concurrency:` inside a reusable resolves to the same
         # group the caller declares and GitHub deadlock-cancels the run at
         # startup ("a deadlock was detected for concurrency group ... between a
@@ -167,7 +167,7 @@ jobs:
         run: |
           set -euo pipefail
           if grep -lE '^concurrency:' .github/workflows/reusable-*.yml; then
-            echo "::error::Reusable workflow(s) above declare a top-level 'concurrency:' — move it to the caller stub; it deadlock-cancels every caller at startup (A-621)."
+            echo "::error::Reusable workflow(s) above declare a top-level 'concurrency:' — move it to the caller stub; it deadlock-cancels every caller at startup (R-621)."
             exit 1
           fi
           echo "OK — no reusable-*.yml declares a top-level concurrency."
@@ -228,13 +228,13 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 📓 Validate changelog entries
-        # Shared SoT with the post-merge enricher (A-800): changelog-core.
+        # Shared SoT with the post-merge enricher (R-800): changelog-core.
         run: pnpm run validate:changelog
 
   go-no-go:
-    # The reference GO/NO GO aggregator (A-418), dogfooded here. Its intrinsic
+    # The reference GO/NO GO aggregator (R-418), dogfooded here. Its intrinsic
     # check-run named `GO/NO GO` is the single gate the estate ruleset requires
-    # (A-425) and the release orchestrator polls (A-419) — pinned to the GitHub
+    # (R-425) and the release orchestrator polls (R-419) — pinned to the GitHub
     # Actions integration so it cannot be forged. The job `needs:` every real CI
     # job and fails if any of them failed or was cancelled. See docs/go-no-go-gate.md
     # for the canonical consumer pattern (this repo dogfoods inline per CLAUDE.md).
@@ -248,7 +248,7 @@ jobs:
       contents: read
     steps:
       - name: ⚖️ Verdict
-        # Pass/fail by inspecting the `needs` results (A-1103). `skipped` is
+        # Pass/fail by inspecting the `needs` results (R-1103). `skipped` is
         # allowlisted only on `release-please--*` branches (path-skipped jobs on
         # changelog-only PRs); everywhere else every needed job must report
         # `success`. This repo's jobs are unconditional, so a skip on a normal
@@ -256,7 +256,7 @@ jobs:
         # dogfood identical to the documented consumer pattern. `failure`,
         # `cancelled` and a null/empty result fail the gate.
         #
-        # `cancelled` is deliberately NOT allowlisted (A-1100). Now that
+        # `cancelled` is deliberately NOT allowlisted (R-1100). Now that
         # `cancel-in-progress: false` stops concurrency ever producing it, a
         # cancelled need can only mean a genuine manual cancel or a job
         # timeout — both of which MUST stay red.
@@ -265,7 +265,7 @@ jobs:
         # check-run counts as SUCCESS for required status checks, so skipping
         # the aggregator would let anyone holding `actions: write` merge
         # failing code by clicking "Cancel workflow" — forging the very gate
-        # the A-425 integration pin exists to make unforgeable.
+        # the R-425 integration pin exists to make unforgeable.
         env:
           # Read through `env:`, never interpolate into the shell body: job
           # names reach this context from the workflow and would otherwise be a
@@ -275,7 +275,7 @@ jobs:
         run: |
           set -euo pipefail
           # Allow `skipped` only on release-please path-skips; otherwise every
-          # needed job must have succeeded (A-1103).
+          # needed job must have succeeded (R-1103).
           if [[ "$HEAD_REF" == release-please--* ]]; then
             ALLOWED='["success","skipped"]'
           else

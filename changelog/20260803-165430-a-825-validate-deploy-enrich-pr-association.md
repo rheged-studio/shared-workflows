@@ -1,8 +1,8 @@
 ---
 title: Document deploy enrich PR association under merge-commit history
-release_note: 'Comments in reusable-changelog-enrich.yml now spell out that commits/{sha}/pulls resolves the associated PR for both squash SHAs (1 parent) and merge commits (2 parents), validated empirically on agent-skills fc7400e / PR #8 (A-825).'
-created_at: '2026-08-03T16:54:30Z'
-merged_at: '2026-08-03T17:06:56Z'
+release_note: "Comments in reusable-changelog-enrich.yml now spell out that commits/{sha}/pulls resolves the associated PR for both squash SHAs (1 parent) and merge commits (2 parents), validated empirically on agent-skills fc7400e / PR #8 (R-825)."
+created_at: "2026-08-03T16:54:30Z"
+merged_at: "2026-08-03T17:06:56Z"
 branch: a-825-validate-changelog-authoring-changelogfinalise-enrichment
 pr: 93
 commit: 9e49dfa
@@ -12,7 +12,7 @@ co_authors: []
 category: docs
 breaking: false
 issues:
-  - A-825
+  - R-825
 stats:
   files_changed: 2
   loc_added: 58
@@ -23,9 +23,9 @@ stats:
 ## Changed
 
 **Document deploy enrich PR association for multi-commit merge history
-([A-825](https://linear.app/rheged-studio/issue/A-825))** — the
+([R-825](https://linear.app/rheged-studio/issue/R-825))** — the
 `reusable-changelog-enrich.yml` resolve step already keyed off
-`GET commits/{sha}/pulls` then `gh pr view … mergeCommit` (A-777); comments now
+`GET commits/{sha}/pulls` then `gh pr view … mergeCommit` (R-777); comments now
 explicitly record that this path works for **both** squash SHAs (1 parent) and
 merge commits (2 parents).
 

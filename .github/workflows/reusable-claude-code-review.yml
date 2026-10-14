@@ -6,7 +6,7 @@ name: Reusable / Claude Code Review
 # on workflow_call). See the caller stub in this repo's `claude-code-review.yml`
 # and the README for the consumer snippet.
 #
-# REQUIRED CALLER PERMISSIONS (A-621): a called reusable workflow's job cannot be
+# REQUIRED CALLER PERMISSIONS (R-621): a called reusable workflow's job cannot be
 # granted more than the caller's GITHUB_TOKEN holds. Under the org default
 # `default_workflow_permissions: read`, a caller with no `permissions:` block
 # hands this workflow a read-only token, the `claude-review` job below can't get
@@ -22,7 +22,7 @@ name: Reusable / Claude Code Review
 #     contents: read
 #     pull-requests: write # Post the review comment
 #     issues: read
-#     actions: read # Install claude-code-action's github_ci MCP server (A-1105)
+#     actions: read # Install claude-code-action's github_ci MCP server (R-1105)
 #     id-token: write # OIDC token exchange (getOidcToken) — required, not optional
 #   jobs:
 #     claude-review:
@@ -60,20 +60,20 @@ on:
 # `concurrency:` — GitHub then detects the workflow deadlocking against its own
 # called job and cancels the run at startup ("a deadlock was detected for
 # concurrency group '<workflow>-<pr#>' between a top level workflow and
-# 'claude-review'"). That broke the review for every caller (A-621). Concurrency
+# 'claude-review'"). That broke the review for every caller (R-621). Concurrency
 # belongs in the CALLER, where the `pull_request` trigger lives; the caller stub
 # already declares it, so this reusable must not.
 
 jobs:
   claude-review:
-    # Dependabot PRs are skipped (A-646): a Dependabot-triggered run reads the
+    # Dependabot PRs are skipped (R-646): a Dependabot-triggered run reads the
     # Dependabot secret store, not Actions secrets, so CLAUDE_CODE_OAUTH_TOKEN is
     # empty by design and the review can't authenticate — skip cleanly (neutral)
     # rather than conclude failure. Draft and release-please branches skip too.
     #
     # The `skip-review` label spares Claude on the release-orchestrator's
     # unattended automation PRs — fan-out rollouts and changelog-enrichment PRs
-    # (A-716). These auto-merge and carry no new behaviour, so reviewing them only
+    # (R-716). These auto-merge and carry no new behaviour, so reviewing them only
     # burns quota. This brings Claude into parity with CodeRabbit, which already
     # honours the same label via the canonical `.coderabbit.yaml`'s
     # `labels: ["!skip-review"]` denylist. It fails safe — a forgotten label means
@@ -95,17 +95,17 @@ jobs:
       # "The github_ci MCP server requires 'actions: read' permission. Skipping CI
       # server installation." and Claude is left holding tool names backed by no
       # server. Granting the scope installs it, so a review can read the PR's CI
-      # status instead of guessing (A-1105). Read-only, and the narrowest scope
+      # status instead of guessing (R-1105). Read-only, and the narrowest scope
       # that satisfies the action's own check.
       #
       # NB: a called reusable workflow's job cannot hold more than the CALLER's
-      # token grants (see A-621 above), so the caller stub must declare
+      # token grants (see R-621 above), so the caller stub must declare
       # `actions: read` too — this line alone is not enough.
       actions: read
       # Required: claude-code-action exchanges an OIDC token for its short-lived
       # GitHub token (getOidcToken → setupGitHubToken). Removing it fails the run
       # with "Could not fetch an OIDC token" — it is NOT just for publishing, so
-      # the A-329 least-privilege drop was reverted.
+      # the R-329 least-privilege drop was reverted.
       id-token: write
 
     steps:
@@ -115,20 +115,20 @@ jobs:
           # Full fetch (all branches/tags), not a depth-1 clone of the PR merge
           # ref: with track_progress on, claude-code-action runs an internal
           # `git fetch origin --depth=20 <head-branch>` and needs the branch
-          # history available (A-636). (Cost: full history — negligible here.)
+          # history available (R-636). (Cost: full history — negligible here.)
           fetch-depth: 0
           # Checkout deliberately does NOT persist the default token in
           # .git/config (artipacked hardening). That alone breaks the internal
           # fetch below, so the next step re-adds a read-scoped credential just
-          # for it (A-674).
+          # for it (R-674).
           persist-credentials: false
 
-      - name: Authenticate git for claude-code-action's internal fetch (A-674)
+      - name: Authenticate git for claude-code-action's internal fetch (R-674)
         # claude-code-action's internal `git fetch origin --depth=20 <head-branch>`
         # (track_progress) uses the ambient git credential, which the checkout
         # above did not persist — so it dies with
         # `fatal: could not read Username for 'https://github.com'` AFTER OIDC
-        # succeeds, and no review posts. A-636's fetch-depth: 0 did NOT fix this:
+        # succeeds, and no review posts. R-636's fetch-depth: 0 did NOT fix this:
         # the fetch fails on auth, before depth is ever consulted. Re-add just the
         # job's read-scoped GITHUB_TOKEN (contents: read) as a github.com fetch
         # credential — equivalent to persist-credentials: true for the default
@@ -144,7 +144,7 @@ jobs:
             "AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 | tr -d '\n')"
 
       - name: 🚦 Guard — CLAUDE_CODE_OAUTH_TOKEN is set
-        # A-646: `required: true` on a workflow_call secret only forces the caller
+        # R-646: `required: true` on a workflow_call secret only forces the caller
         # to MAP the secret (e.g. `secrets: inherit`) — it does NOT guarantee a
         # non-empty VALUE. A consumer inheriting from a repo where the secret is
         # unset passes an empty string that satisfies the schema, then
@@ -156,7 +156,7 @@ jobs:
         run: |
           set -euo pipefail
           if [ -z "${CLAUDE_CODE_OAUTH_TOKEN:-}" ]; then
-            echo "::error::CLAUDE_CODE_OAUTH_TOKEN is empty. Define it as a repository Actions secret in the consuming repo (it is NOT ANTHROPIC_API_KEY, and there is no org-level secret) and pass 'secrets: inherit' from the caller (A-646)."
+            echo "::error::CLAUDE_CODE_OAUTH_TOKEN is empty. Define it as a repository Actions secret in the consuming repo (it is NOT ANTHROPIC_API_KEY, and there is no org-level secret) and pass 'secrets: inherit' from the caller (R-646)."
             exit 1
           fi
           echo "OK — CLAUDE_CODE_OAUTH_TOKEN is present."
@@ -175,7 +175,7 @@ jobs:
           # fails the regex ("Invalid marketplace URL format") and a bare URL
           # always clones the marketplace at default-branch HEAD. So the
           # immutable-tag pin is impossible here and the marketplace necessarily
-          # floats (A-343). Accepted risk: the marketplace repo is the same
+          # floats (R-343). Accepted risk: the marketplace repo is the same
           # first-party org (anthropics) as the SHA-pinned action above, and the
           # review is already hardened — WebSearch/WebFetch disallowed, tight
           # --allowedTools, no publish identity. Do NOT re-add a `#tag` suffix:
@@ -188,7 +188,7 @@ jobs:
           use_sticky_comment: ${{ inputs.use_sticky_comment }}
           claude_args: '--allowedTools "mcp__github_inline_comment__create_inline_comment,mcp__github_comment__update_claude_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"'
 
-      - name: 🔎 Surface the Claude failure (A-1105)
+      - name: 🔎 Surface the Claude failure (R-1105)
         # The step above runs the SDK with `show_full_output: false` (the secure
         # default) and prints only "Running Claude Code via SDK (full output
         # hidden for security)…". When the SDK errors, ALL a maintainer sees is
@@ -221,7 +221,7 @@ jobs:
           [ -n "$file" ] || file="${RUNNER_TEMP}/claude-execution-output.json"
 
           if [ ! -f "$file" ]; then
-            echo "::warning::No Claude execution log at '${file}' — the action failed before writing one (A-1105)."
+            echo "::warning::No Claude execution log at '${file}' — the action failed before writing one (R-1105)."
             exit 0
           fi
 
@@ -239,7 +239,7 @@ jobs:
           ' "$file" 2>/dev/null | head -c 2000)
 
           if [ -z "$summary" ]; then
-            echo "::warning::Claude execution log at '${file}' was unparseable JSON (A-1105)."
+            echo "::warning::Claude execution log at '${file}' was unparseable JSON (R-1105)."
             exit 0
           fi
 

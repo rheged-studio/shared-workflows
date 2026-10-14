@@ -5,7 +5,7 @@ version: "0.2.0"
 created_at: "2026-06-26T14:35:44Z"
 category: feature
 breaking: false
-issues: ["A-440"]
+issues: ["R-440"]
 branch: sk-440-author-the-shared-composite-action-layer-setup-project
 merged_at: "2026-06-26T14:35:44Z"
 commit: 132d746

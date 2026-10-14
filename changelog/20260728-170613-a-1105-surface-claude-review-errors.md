@@ -12,7 +12,7 @@ co_authors: []
 category: feature
 breaking: false
 issues:
-  - A-1105
+  - R-1105
 stats:
   files_changed: 3
   loc_added: 181
@@ -43,7 +43,7 @@ stats:
   same scope to their caller stub, since a called reusable workflow's job cannot
   hold more than the caller's token grants.
 
-A-1105 was diagnosed as a GitHub App installation-token failure, on the strength
+R-1105 was diagnosed as a GitHub App installation-token failure, on the strength
 of a zero-byte `curl` body in the log. That `curl` is the action's _post-job_
 token revocation (`DELETE /installation/token`), where an empty body is the
 correct response and which runs only after the job has already failed. The actual

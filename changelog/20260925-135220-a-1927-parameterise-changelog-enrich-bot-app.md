@@ -11,7 +11,7 @@ co_authors: []
 category: feature
 breaking: false
 issues:
-  - A-1927
+  - R-1927
 stats:
   files_changed: 8
   loc_added: 223
@@ -21,7 +21,7 @@ stats:
 
 ## Changed
 
-**Parameterise `reusable-changelog-enrich` bot/App identity ([A-1927](https://linear.app/rheged-studio/issue/A-1927))**
+**Parameterise `reusable-changelog-enrich` bot/App identity ([R-1927](https://linear.app/rheged-studio/issue/R-1927))**
 
 - Add optional `app-client-id`, `app-id`, `bot-name`, and `bot-email` inputs plus `APP_PRIVATE_KEY` secret (road-runner defaults preserve Rheged callers on `secrets: inherit`)
 - Extend `load-repo-config` with optional `githubAppClientId`, `botName`, and `botEmail` outputs

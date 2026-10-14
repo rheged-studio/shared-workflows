@@ -1,9 +1,9 @@
-# Pre-GA security review — shared workflows (A-422)
+# Pre-GA security review — shared workflows (R-422)
 
-This is the sign-off record for [A-422](https://linear.app/rheged-studio/issue/A-422),
+This is the sign-off record for [R-422](https://linear.app/rheged-studio/issue/R-422),
 the pre-GA gate that declares the `reusable-*` workflows and Layer-1 composite actions
 generally available. It reviews the **finished** trust surface (the workflows were already
-authored and hardened — A-313/326/328/330/417/646), consciously blesses the floating-`@v1`
+authored and hardened — R-313/326/328/330/417/646), consciously blesses the floating-`@v1`
 auto-propagation model, and confirms the org-level SHA-pin policy and Dependabot hygiene.
 
 - **Reviewer:** Rob Easthope
@@ -12,7 +12,7 @@ auto-propagation model, and confirms the org-level SHA-pin policy and Dependabot
 - **Overall verdict:** **PASS to GA**, subject to the open follow-ups in
   [§8](#8-findings--follow-ups) — **none GA-blocking**: the ruleset source-of-truth drift is
   an in-repo hygiene fix, and npm OIDC Trusted Publishing is a post-GA verification (one
-  live publish, A-456).
+  live publish, R-456).
 
 The trust model this review validates is defined in
 [ADR 0001 §D5/§D6](adr/0001-shared-ci-architecture-for-npm-packages.md) and codified for
@@ -29,12 +29,12 @@ so the shared repo is part of every consumer's **publish trust boundary**.
 | `id-token: write` isolated to the two publish legs; `build` job holds no credential                                                                                                 | `:200`, `:271`, `:471`             | ✅      |
 | `packages: write` isolated to the GitHub Packages leg, never the npm leg                                                                                                            | `:469-472` vs `:269-271`           | ✅      |
 | npm OIDC Trusted Publishing — **no `NPM_TOKEN`**, `--provenance`                                                                                                                    | `:364-404`                         | ✅      |
-| Build-once: one byte-identical tarball packed with `--ignore-scripts`, asserted `== 1 .tgz`, re-asserted in both publish legs — no build code runs next to a mintable token (A-328) | `:224-254`, `:340-355`, `:495-508` | ✅      |
+| Build-once: one byte-identical tarball packed with `--ignore-scripts`, asserted `== 1 .tgz`, re-asserted in both publish legs — no build code runs next to a mintable token (R-328) | `:224-254`, `:340-355`, `:495-508` | ✅      |
 | `push` + `ref == release-branch` gates on every publish/tag step                                                                                                                    | `:365-368`, `:412-415`, `:460-464` | ✅      |
 | Version-vs-tag gate (publish iff `package.json` version has no matching tag)                                                                                                        | `:312-327`                         | ✅      |
-| Registry-host pinning — GH Packages leg hard-codes `npm.pkg.github.com`, fails closed (A-330)                                                                                       | `:533-537`                         | ✅      |
+| Registry-host pinning — GH Packages leg hard-codes `npm.pkg.github.com`, fails closed (R-330)                                                                                       | `:533-537`                         | ✅      |
 | `persist-credentials: false` on every checkout (artipacked)                                                                                                                         | `:209/277/477`                     | ✅      |
-| No `workflow_dispatch` — a dispatched run satisfies the same OIDC subject as a legitimate push and could publish a poisoned tarball with valid provenance (A-326)                   | `:94-95`, header `:43-48`          | ✅      |
+| No `workflow_dispatch` — a dispatched run satisfies the same OIDC subject as a legitimate push and could publish a poisoned tarball with valid provenance (R-326)                   | `:94-95`, header `:43-48`          | ✅      |
 
 **Residual (accepted, consumer-side):** two controls are enforced only in the **consumer
 caller**, not here, because `workflow_call` cannot own them:
@@ -46,7 +46,7 @@ caller**, not here, because `workflow_call` cannot own them:
 Both are documented in the file header and in `SECURITY.md`. npm Trusted Publishing
 validates the **caller's** `workflow_ref`, not this callee, so it is **unproven by
 inspection** — it must be verified with **one live publish** before estate rollout
-([A-456](https://linear.app/rheged-studio/issue/A-456)).
+([R-456](https://linear.app/rheged-studio/issue/R-456)).
 
 ## 2. Surface — secrets flow across the caller boundary
 
@@ -55,15 +55,15 @@ Every `reusable-*.yml` sets root `permissions: {}` and declares **typed** `secre
 
 | Reusable                          | Secret                    | Consumed by                            | Empty-value guard       |
 | --------------------------------- | ------------------------- | -------------------------------------- | ----------------------- |
-| `reusable-claude.yml`             | `CLAUDE_CODE_OAUTH_TOKEN` | `claude-code-action` (`:117`)          | ✅ A-646 (`:93-109`)    |
-| `reusable-claude-code-review.yml` | `CLAUDE_CODE_OAUTH_TOKEN` | `claude-code-action` (`:156`)          | ✅ A-646 (`:132-148`)   |
+| `reusable-claude.yml`             | `CLAUDE_CODE_OAUTH_TOKEN` | `claude-code-action` (`:117`)          | ✅ R-646 (`:93-109`)    |
+| `reusable-claude-code-review.yml` | `CLAUDE_CODE_OAUTH_TOKEN` | `claude-code-action` (`:156`)          | ✅ R-646 (`:132-148`)   |
 | `reusable-changelog-enrich.yml`   | `ROADRUNNER_PRIVATE_KEY`  | `create-github-app-token` (`:156-166`) | ✅ **added in this PR** |
 
 All other reusables (`pkg-release`, `build-test`, `lint`, `load-repo-config`,
 `validate-payload`, `validate-pr-title`) declare **no `secrets:` block** and rely only on
 the automatic `GITHUB_TOKEN` — correct, since none needs a user secret.
 
-**Finding fixed here:** `reusable-changelog-enrich.yml` previously lacked the A-646
+**Finding fixed here:** `reusable-changelog-enrich.yml` previously lacked the R-646
 empty-token guard the two Claude workflows carry — a `required: true` secret only forces
 the caller to _map_ the secret, not to supply a non-empty _value_. An empty
 `ROADRUNNER_PRIVATE_KEY` would have died deep inside JWT signing with an opaque error and
@@ -84,7 +84,7 @@ Internal Layer-1 composite actions are referenced by full cross-repo path, SHA-p
 the `v1.5.0` tag SHA (`ba77002…`). **One divergence noted, deferred:**
 `reusable-pkg-release.yml:212/220` still pin `setup-project`/`build` to the pre-release SHA
 `d0a5949` rather than `ba77002 # v1.5.0`. This is within
-[A-618](https://linear.app/rheged-studio/issue/A-618)'s re-pin remit and is **not**
+[R-618](https://linear.app/rheged-studio/issue/R-618)'s re-pin remit and is **not**
 changed here (see [§8](#8-findings--follow-ups)). It is not a security regression — `d0a5949`
 is a real, immutable in-repo SHA — only a pin-consistency item.
 
@@ -130,7 +130,7 @@ source of truth (`docs/rulesets.md`), so it should be reconciled to match live e
 
 ## 5. Org-level SHA-pin policy — enforced org-wide
 
-A-422 requires confirming the "block non-SHA-pinned actions" policy is enforced at **org**
+R-422 requires confirming the "block non-SHA-pinned actions" policy is enforced at **org**
 level, not merely per repo. **Confirmed:**
 
 ```text
@@ -148,7 +148,7 @@ consumer callers float on `@v1` ([§6](#6-floating-v1-auto-propagation--consciou
 
 ## 6. Floating-`@v1` auto-propagation — conscious sign-off
 
-Since [A-662](https://linear.app/rheged-studio/issue/A-662) (v1.0.3), consumer caller
+Since [R-662](https://linear.app/rheged-studio/issue/R-662) (v1.0.3), consumer caller
 stubs float on the `@v1` major tag rather than SHA-pinning each shared-workflow reference.
 [`move-floating-major.yml`](../.github/workflows/move-floating-major.yml) force-moves the
 lightweight `v1` ref onto each release commit (on `release: published`, `contents: write`,
@@ -194,9 +194,9 @@ with the floating-tag flow, not a registry bump.
 | #   | Item                                                                                                                                       | Disposition                                                                                                                     |
 | --- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
 | 1   | `actions/checkout` v4.2.2 → v7.0.0 drift in `reusable-validate-payload.yml`                                                                | **Fixed in this PR.**                                                                                                           |
-| 2   | Missing A-646 empty-token guard for `ROADRUNNER_PRIVATE_KEY` in `reusable-changelog-enrich.yml`                                            | **Fixed in this PR.**                                                                                                           |
-| 3   | `reusable-pkg-release.yml:212/220` internal pins on `d0a5949` vs `ba77002 # v1.5.0`                                                        | **Deferred to [A-618](https://linear.app/rheged-studio/issue/A-618)** (its re-pin remit). Not a security regression.            |
+| 2   | Missing R-646 empty-token guard for `ROADRUNNER_PRIVATE_KEY` in `reusable-changelog-enrich.yml`                                            | **Fixed in this PR.**                                                                                                           |
+| 3   | `reusable-pkg-release.yml:212/220` internal pins on `d0a5949` vs `ba77002 # v1.5.0`                                                        | **Deferred to [R-618](https://linear.app/rheged-studio/issue/R-618)** (its re-pin remit). Not a security regression.            |
 | 4   | Live "Trunk" ruleset drifts from committed `trunk.json` (roadrunner-bot bypass actor; 2nd required check `validate-payload` vs `pr-title`) | **Open — reconcile the committed JSON to live** (or re-apply if the JSON is authoritative). Gate remains sound in the meantime. |
-| 5   | npm OIDC Trusted Publishing unproven by inspection                                                                                         | **Verify with one live publish — [A-456](https://linear.app/rheged-studio/issue/A-456).**                                       |
+| 5   | npm OIDC Trusted Publishing unproven by inspection                                                                                         | **Verify with one live publish — [R-456](https://linear.app/rheged-studio/issue/R-456).**                                       |
 
 Items 1–2 land here; 3–5 are tracked elsewhere. None blocks GA.

@@ -2,9 +2,9 @@ name: Reusable / Validate PR title
 
 # Reusable (workflow_call) version of the estate's conventional-PR-title check.
 #
-# Dual merge policy (A-1176 / A-1175 / A-1177): feature / ship PRs use merge
+# Dual merge policy (R-1176 / R-1175 / R-1177): feature / ship PRs use merge
 # commits; release-please version PRs and fan-out PRs stay squash. Both
-# allow_merge_commit and allow_squash_merge remain on (A-1177).
+# allow_merge_commit and allow_squash_merge remain on (R-1177).
 #
 # This workflow still lints the PR title as a Conventional Commit — useful for
 # humans, send-it, and squash merges where the title becomes the trunk subject.
@@ -15,7 +15,7 @@ name: Reusable / Validate PR title
 # The `pull_request` trigger stays in the CALLER stub; include `edited` so the
 # check re-runs when a title is corrected (the default set omits it).
 #
-# STATUS-CHECK CONTEXT (A-400 / A-405): the job below is named
+# STATUS-CHECK CONTEXT (R-400 / R-405): the job below is named
 # `Validate PR title is a Conventional Commit` — the estate-canonical string a
 # single required-check rule can pin across every repo. A reusable-workflow
 # check renders as `<caller-job-id> / <job-name>`, so callers MUST use a
@@ -23,7 +23,7 @@ name: Reusable / Validate PR title
 # context `pr-title / Validate PR title is a Conventional Commit`. Do NOT rename
 # either half.
 #
-# REQUIRED CALLER PERMISSIONS (A-621): a called reusable workflow's job cannot be
+# REQUIRED CALLER PERMISSIONS (R-621): a called reusable workflow's job cannot be
 # granted more than the caller's GITHUB_TOKEN holds. Under the org default
 # `default_workflow_permissions: read`, a caller with no `permissions:` block
 # hands this workflow a read-only token, the `pr-title` job below can't get the

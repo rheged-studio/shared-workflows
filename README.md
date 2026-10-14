@@ -19,12 +19,12 @@ release gate pattern).
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
 | `reusable-claude.yml`             | Interactive `@claude` on issues / PR comments / reviews.                                                                        | `CLAUDE_CODE_OAUTH_TOKEN`                         |
 | `reusable-claude-code-review.yml` | Automated Claude review on pull requests.                                                                                       | `CLAUDE_CODE_OAUTH_TOKEN`                         |
-| `reusable-validate-pr-title.yml`  | Enforce a Conventional Commit PR title (dual merge policy; not sole bump signal — A-1176).                                      | — (uses `GITHUB_TOKEN`)                           |
-| `reusable-validate-commits.yml`   | Enforce Conventional Commits on every `base..head` commit (A-981; per-commit merge gate).                                       | — (uses `GITHUB_TOKEN`)                           |
+| `reusable-validate-pr-title.yml`  | Enforce a Conventional Commit PR title (dual merge policy; not sole bump signal — R-1176).                                      | — (uses `GITHUB_TOKEN`)                           |
+| `reusable-validate-commits.yml`   | Enforce Conventional Commits on every `base..head` commit (R-981; per-commit merge gate).                                       | — (uses `GITHUB_TOKEN`)                           |
 | `reusable-lint.yml`               | Coarse lint bundle — ESLint, markdownlint, yamllint/actionlint, changelog-validate, optional Prettier + setup-script (Layer 2). | — (uses `GITHUB_TOKEN`)                           |
 | `reusable-build-test.yml`         | Coarse build/test bundle — build, typecheck, Vitest, ShellCheck, bats (Layer 2).                                                | — (uses `GITHUB_TOKEN`)                           |
 | `reusable-pkg-release.yml`        | Build-once → npm OIDC Trusted Publishing → GitHub Packages mirror → tag + release (Layer 2).                                    | — (OIDC + `GITHUB_TOKEN`)                         |
-| `reusable-load-repo-config.yml`   | Load + allowlist-validate `infrastructure/repo-config.yaml` → job outputs (Layer 2, A-779).                                     | — (uses `GITHUB_TOKEN`)                           |
+| `reusable-load-repo-config.yml`   | Load + allowlist-validate `infrastructure/repo-config.yaml` → job outputs (Layer 2, R-779).                                     | — (uses `GITHUB_TOKEN`)                           |
 | `reusable-validate-payload.yml`   | Fan-out payload check — skills bundles and/or `.coderabbit.yaml` (Layer 2).                                                     | — (uses `GITHUB_TOKEN`)                           |
 | `reusable-changelog-enrich.yml`   | Post-merge changelog enrich / finalise via `@rheged-studio/changelog-core` (Layer 2).                                           | `ROADRUNNER_PRIVATE_KEY` and/or `APP_PRIVATE_KEY` |
 
@@ -49,7 +49,7 @@ granted and the run dies at compile time with a **`startup_failure`**: no jobs,
 no logs, and the REST API does not expose the reason (`gh run view` only offers a
 generic "workflow file issue" hint; annotations 404). **Read the one-line error
 on the Actions UI run page.** This is the single most common adoption trap
-(A-621) — and the usual reason a consumer's Claude review 'never posts'.
+(R-621) — and the usual reason a consumer's Claude review 'never posts'.
 
 So every caller stub below declares the top-level `permissions:` block its
 reusable needs (a job-level block on the calling job — as the
@@ -80,7 +80,7 @@ dropping it fails the run outright.
 The two Claude workflows authenticate via **one** secret,
 `CLAUDE_CODE_OAUTH_TOKEN`. It is **not** `ANTHROPIC_API_KEY` — claude-code-action
 prints an empty `ANTHROPIC_API_KEY` as an unused alt-auth input, which is a red
-herring, not the cause of a failed run (A-646).
+herring, not the cause of a failed run (R-646).
 
 - **There is no org-level secret.** Each consuming repo defines its **own
   repository Actions secret** named `CLAUDE_CODE_OAUTH_TOKEN`; the caller stub
@@ -147,7 +147,7 @@ on:
 
 # Concurrency lives HERE (the caller), not in the reusable: a reusable runs as
 # this job, so a top-level `concurrency:` inside the reusable resolves to the
-# same group and deadlock-cancels the run (A-621). This reusable declares none.
+# same group and deadlock-cancels the run (R-621). This reusable declares none.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: true
@@ -193,7 +193,7 @@ jobs:
     uses: rheged-studio/shared-workflows/.github/workflows/reusable-validate-pr-title.yml@v1
 ```
 
-**Required-check context (A-400 / A-405).** The reusable job is named
+**Required-check context (R-400 / R-405).** The reusable job is named
 `Validate PR title is a Conventional Commit`, and a reusable-workflow check
 renders as `<caller-job-id> / <job-name>`. Use the caller job id **`pr-title`**
 so every repo reports the same context —
@@ -223,7 +223,7 @@ jobs:
     uses: rheged-studio/shared-workflows/.github/workflows/reusable-validate-commits.yml@v1
 ```
 
-**Required-check context (A-400 / A-405).** The reusable job is named
+**Required-check context (R-400 / R-405).** The reusable job is named
 `Validate commits are Conventional Commits`, and a reusable-workflow check
 renders as `<caller-job-id> / <job-name>`. Use the caller job id **`commits`**
 so every repo reports the same context —
@@ -272,7 +272,7 @@ Each lane has a boolean opt-out (`eslint`, `markdown`, `yaml`, `actionlint`,
   consumer's `.prettierignore`.
 
 Disabling **every** lane is a hard error, not a silent green pass — the run
-fails fast before checkout (A-445).
+fails fast before checkout (R-445).
 
 Caller stub with the optional inputs commented out:
 
@@ -313,7 +313,7 @@ default `true`; `bats` and `coverage` default `false` — alongside pass-through
 `shellcheck-severity` and `bats-paths`. Opt-in: `setup-script` (string, default
 empty) runs `pnpm run <script>` after install and before the first build/test
 step (e.g. codegen). As with the lint bundle, disabling **every** lane fails
-fast rather than passing green (A-445).
+fast rather than passing green (R-445).
 
 ```yaml
 jobs:
@@ -331,7 +331,7 @@ jobs:
 name: Package release
 
 # NO workflow_dispatch — a dispatched run satisfies the same npm OIDC subject as
-# a legitimate post-merge push and could publish a poisoned tarball (A-326).
+# a legitimate post-merge push and could publish a poisoned tarball (R-326).
 on:
   push:
     branches: [main]
@@ -361,7 +361,7 @@ jobs:
 **Consumer prerequisite:** define a branch-protected **`npm-release`**
 environment restricted to the release branch. A reusable workflow's
 `environment:` resolves in the caller repo; if it is absent GitHub silently
-auto-creates it **unprotected**, losing the ref gate (A-326). There is **no**
+auto-creates it **unprotected**, losing the ref gate (R-326). There is **no**
 `secrets:` block — the npm leg publishes via OIDC Trusted Publishing (no
 `NPM_TOKEN`) and the Packages/tag/release legs use the automatic `GITHUB_TOKEN`.
 `npm-scope` is the only required input; a build-less package (config- or
@@ -371,7 +371,7 @@ bundle-only, no `build` script) passes `build: false`. Other notable inputs:
 ### `reusable-load-repo-config.yml`
 
 Loads and allowlist-validates the caller's `infrastructure/repo-config.yaml`
-into job outputs (A-779). Prefer this over a local `.github/actions/load-repo-config`
+into job outputs (R-779). Prefer this over a local `.github/actions/load-repo-config`
 copy — the composite is SHA-pinned inside the reusable; consumers float `@v1`.
 
 ```yaml
@@ -391,17 +391,17 @@ jobs:
 
 Outputs: `default_branch`, `node_version_file`, `npm_registry_url`, `npm_scope`,
 `github_packages_registry_url`, and optional `app_client_id`, `bot_name`,
-`bot_email` (changelog write-back identity — A-1927). Callers map only the subset
+`bot_email` (changelog write-back identity — R-1927). Callers map only the subset
 their downstream jobs need.
 
 ### `reusable-validate-payload.yml`
 
-Fan-out payload check (A-738). Callers declare what must be present — never
+Fan-out payload check (R-738). Callers declare what must be present — never
 auto-detected. The job name is `Validate fanned payload`; callers **must** use
 the job id `validate-payload` so the ruleset-pinnable context is
 `validate-payload / Validate fanned payload`.
 
-The caller stub is **repo-owned** (A-780): place it once at onboarding (copy
+The caller stub is **repo-owned** (R-780): place it once at onboarding (copy
 below), pin `@v1` (or let Dependabot bump a SHA), and make the status context
 required on `main`. The release-orchestrator does **not** vendor or refresh this
 file.
@@ -429,21 +429,21 @@ jobs:
 
 Post-merge fill of dated `changelog/` entries via
 [`@rheged-studio/changelog-core`](https://www.npmjs.com/package/@rheged-studio/changelog-core)
-(A-793 / A-821). Resolves the just-merged PR from the push SHA, runs `enrich`
+(R-793 / R-821). Resolves the just-merged PR from the push SHA, runs `enrich`
 and (optionally) `finalise`, then pushes **only** `changelog/**` as the configured
 bot (Rheged default: `road-runner-bot[bot]`). Write-back mints a repo-scoped
 GitHub App installation token — Actions cannot be a Trunk bypass actor on this
-org (ADR 0004 / A-794), so the protected-branch bypass actor **must match** the
+org (ADR 0004 / R-794), so the protected-branch bypass actor **must match** the
 configured bot; the path limit is workflow discipline (stage only `changelog/**`).
 
 Rheged adopters pass `secrets: inherit` and rely on road-runner defaults
 (`ROADRUNNER_PRIVATE_KEY` + `vars.ROADRUNNER_CLIENT_ID`). Other repos pass
 `APP_PRIVATE_KEY`, `app-id` or `app-client-id`, and `bot-name` / `bot-email`
-inputs (A-1927).
+inputs (R-1927).
 
-`@v1` includes the road-runner-bot write-back (A-821) as of **v1.5.0**, so pin
+`@v1` includes the road-runner-bot write-back (R-821) as of **v1.5.0**, so pin
 callers to `@v1` like any other reusable workflow — no SHA pin is needed. (Early
-adopters pinned the A-821 merge SHA directly while `@v1` still predated it, before
+adopters pinned the R-821 merge SHA directly while `@v1` still predated it, before
 v1.5.0 moved the floating major onto that commit.)
 
 **Consumer prerequisites:**
@@ -506,7 +506,7 @@ changelog-enrich:
 
 `pull-requests: read` is required for the commits→pulls resolution API;
 `contents: read` covers checkout + resolve — write to `main` uses the App
-token, not `GITHUB_TOKEN`. A-793's "no publish scopes" constraint (no
+token, not `GITHUB_TOKEN`. R-793's "no publish scopes" constraint (no
 `id-token` / `packages` / `attestations`) still holds. Other inputs:
 `node-version-file` (default `.nvmrc`), `changelog-dir` (default `changelog`),
 `app-client-id`, `app-id`, `bot-name`, and `bot-email` (road-runner defaults).

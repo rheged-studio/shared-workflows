@@ -3,15 +3,15 @@
 The estate gates merges and releases on a single check-run named **`GO/NO GO`**: an
 `if: always()` aggregator job that `needs:` every real CI job in a repo and concludes
 `success` only when all of them passed (or legitimately skipped). Its **intrinsic
-check-run is the gate** — the estate ruleset requires it (A-425, pinned to the GitHub
+check-run is the gate** — the estate ruleset requires it (R-425, pinned to the GitHub
 Actions integration so it cannot be forged) and the release orchestrator polls it before
-squash-merging a release PR (A-419).
+squash-merging a release PR (R-419).
 
 This is the per-repo pattern chosen in [ADR 0001 §5.4](adr/0001-shared-ci-architecture-for-npm-packages.md):
 the gate lives in each consumer because only the repo itself can enumerate _all_ of its
 jobs — the shared `reusable-*` workflows deliberately do **not** name themselves the gate.
 
-The estate ruleset that requires this check is versioned in this repo under A-425.
+The estate ruleset that requires this check is versioned in this repo under R-425.
 
 `shared-workflows` dogfoods the pattern inline in its own
 [`ci.yml`](../.github/workflows/ci.yml) (see `CLAUDE.md` for why this repo cannot consume
@@ -50,7 +50,7 @@ go-no-go:
       run: |
         set -euo pipefail
         # Allow `skipped` only on release-please path-skips; otherwise every
-        # needed job must have succeeded (A-1103).
+        # needed job must have succeeded (R-1103).
         if [[ "$HEAD_REF" == release-please--* ]]; then
           ALLOWED='["success","skipped"]'
         else
@@ -74,7 +74,7 @@ one coarse bundle or six fine ones — so it never forces the split (ADR 0001 §
 - **`if: always()` is mandatory.** Without it the aggregator inherits the default
   "skip if any `needs:` failed" behaviour, so on a real failure it skips, the check-run
   is never minted, and the ruleset's required check never reports.
-- **Concurrency must never cancel a running gate run (A-1100).** With
+- **Concurrency must never cancel a running gate run (R-1100).** With
   `cancel-in-progress: true`, a superseded run's `needs` all report `cancelled`; the
   `always()` aggregator still executes; and the verdict — which allows only `success` or
   `skipped` — mints a **failure** check-run for a run that never failed. Set
@@ -83,19 +83,19 @@ one coarse bundle or six fine ones — so it never forces the split (ADR 0001 §
   check-runs at all. Cost is bounded — GitHub keeps at most one pending run per group and
   collapses the rest, so a burst of four events costs two full runs, not four. This also
   subsumes the narrower release-branch carve-out
-  (`github.head_ref != 'release-please--branches--main'`, A-961): `false` covers every
+  (`github.head_ref != 'release-please--branches--main'`, R-961): `false` covers every
   branch, not just `release-please--*`.
 - **`!cancelled()` on the aggregator is a gate bypass, not a fix.** A `skipped` check-run
   is [treated as success](https://docs.github.com/en/pull-requests/reference/status-checks)
   for required status checks, and cancelling a run needs only `actions: write` — which
   every write-access collaborator holds. Skipping the aggregator on cancellation would
   therefore let anyone merge failing code by clicking "Cancel workflow", forging the very
-  check the A-425 integration pin exists to make unforgeable. Keep `cancelled` out of the
+  check the R-425 integration pin exists to make unforgeable. Keep `cancelled` out of the
   verdict allowlist for the same reason: once concurrency cannot produce it, it can only
   mean a genuine manual cancel or a job timeout, both of which must stay red.
   (`cancelled()` is also
   [documented-unreliable on supersession](https://github.com/actions/runner/issues/3041).)
-- **The gate must never go green off a run that skipped its real CI (A-1103).** The
+- **The gate must never go green off a run that skipped its real CI (R-1103).** The
   canonical verdict therefore allowlists `skipped` **only** on `release-please--*`
   branches (path-skipped jobs on changelog-only PRs). On every other branch every
   needed job must report `success` — an all-`skipped` `needs` set fails the gate. That
@@ -126,8 +126,8 @@ in a reusable workflow, for the same reason the gate itself cannot.
 ## Rollout
 
 The migration is complete: the orchestrator and every served repo's ruleset require the
-`GO/NO GO` check-run only. A-419 opened a dual-accept window (`🔬 Build & Lint` **or**
-`GO/NO GO`) so repos could adopt the aggregator without a flag day; A-596 collapsed it to
-`GO/NO GO`-only once every served repo emitted it, and A-437 removed the old name from the
+`GO/NO GO` check-run only. R-419 opened a dual-accept window (`🔬 Build & Lint` **or**
+`GO/NO GO`) so repos could adopt the aggregator without a flag day; R-596 collapsed it to
+`GO/NO GO`-only once every served repo emitted it, and R-437 removed the old name from the
 rulesets. The `🔬 Build & Lint` job, where it still exists, survives as ordinary CI feeding
 the aggregator's `needs:` — it is no longer a gate.

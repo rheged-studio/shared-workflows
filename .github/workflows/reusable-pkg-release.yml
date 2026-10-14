@@ -2,19 +2,19 @@ name: Reusable / Package release
 
 # Reusable (workflow_call) version of the estate's hardened release flow — the
 # build-once → npm OIDC Trusted Publishing → GitHub Packages mirror → tag +
-# GitHub release pipeline (ports A-328 / A-326 / A-323 into one source of
+# GitHub release pipeline (ports R-328 / R-326 / R-323 into one source of
 # truth, replacing the per-repo `pkg-release.yml` copies that would otherwise drift,
-# A-384/A-417).
+# R-384/R-417).
 #
 # Three jobs, each least-privileged:
 #   1. build   — pnpm install + build + `npm pack` in a job holding NO publish
 #                credential. The single tarball it packs is the exact artefact
 #                both publish legs ship, so the npm tarball, the GitHub Packages
 #                tarball and the attested digest are byte-identical, and no
-#                build-time code ever runs next to a mintable OIDC token (A-328).
+#                build-time code ever runs next to a mintable OIDC token (R-328).
 #   2. release — npm leg. OIDC Trusted Publishing (no NPM_TOKEN), `--provenance`,
 #                version-vs-tag gate, then tag + GitHub release.
-#   3. publish-github-packages — secondary mirror (A-323), a SEPARATE job so
+#   3. publish-github-packages — secondary mirror (R-323), a SEPARATE job so
 #                `packages: write` is never granted to the npm leg; provenance via
 #                a GitHub-native attestation over the same tarball.
 #
@@ -31,11 +31,11 @@ name: Reusable / Package release
 # consuming package configures its npmjs.com Trusted Publisher against ITS OWN
 # caller filename, and `id-token: write` must be present on BOTH the caller job
 # (`uses:` this workflow) and the publish jobs here. This cannot be proven by
-# inspection — verify with one live publish before estate rollout (A-417).
+# inspection — verify with one live publish before estate rollout (R-417).
 #
 # CONSUMER PREREQUISITE — branch-protected `npm-release` environment: a reusable
 # workflow's `environment:` resolves in the CALLER repo. Each consumer must
-# define `npm-release` and restrict it to the release branch (A-326 ref gate).
+# define `npm-release` and restrict it to the release branch (R-326 ref gate).
 # If the environment is absent GitHub silently auto-creates it UNPROTECTED on
 # first run, losing the restriction — so this is a hard prerequisite, not a
 # default.
@@ -45,7 +45,7 @@ name: Reusable / Package release
 # (queue releases) and MUST NOT add `workflow_dispatch` — a dispatched run can
 # target any ref but satisfies the same npm OIDC subject as a legitimate
 # post-merge push, so it could publish a poisoned tarball with valid provenance
-# (A-326). Re-run a failed release via "Re-run jobs" on the original push run.
+# (R-326). Re-run a failed release via "Re-run jobs" on the original push run.
 #
 # SAME-REPO ACTION REFERENCES: a reusable workflow CANNOT reach its sibling
 # actions via a local `./.github/actions/…` path — inside a `workflow_call` job a
@@ -60,7 +60,7 @@ name: Reusable / Package release
 # This repo does NOT dogfood this workflow (it publishes nothing, and the same
 # circularity that inlines ci.yml/claude.yml applies); consumers exercise it.
 #
-# REQUIRED CALLER PERMISSIONS (A-621): a called reusable workflow's job cannot be
+# REQUIRED CALLER PERMISSIONS (R-621): a called reusable workflow's job cannot be
 # granted more than the caller's GITHUB_TOKEN holds. Under the org default
 # `default_workflow_permissions: read`, a caller that omits the `permissions:`
 # block below hands the publish jobs a read-only token; they can't get the
@@ -75,7 +75,7 @@ name: Reusable / Package release
 #   name: Package release
 #   on:
 #     push:
-#       branches: [main]   # NO workflow_dispatch (A-326)
+#       branches: [main]   # NO workflow_dispatch (R-326)
 #   concurrency:
 #     group: ${{ github.workflow }}-${{ github.ref }}
 #     cancel-in-progress: false
@@ -114,7 +114,7 @@ on:
         description: >-
           GitHub Packages registry for the mirror leg. Asserted against the known
           host before publishing (the ephemeral GITHUB_TOKEN must never be sent to
-          a data-driven host — A-330).
+          a data-driven host — R-330).
         type: string
         required: false
         default: https://npm.pkg.github.com
@@ -133,7 +133,7 @@ on:
       environment:
         description: >-
           Deployment environment for the publish jobs. Must exist in the consumer
-          repo and be restricted to the release branch (A-326).
+          repo and be restricted to the release branch (R-326).
         type: string
         required: false
         default: npm-release
@@ -190,7 +190,7 @@ permissions: {}
 
 jobs:
   # Build-time code (pnpm install + build + npm pack) runs ONLY here, in a job
-  # that holds no publish credential (A-328). The single tarball this job packs
+  # that holds no publish credential (R-328). The single tarball this job packs
   # is the exact artefact both publish legs download and ship.
   build:
     name: 🏗️ Build & pack
@@ -256,7 +256,7 @@ jobs:
           # `npm-tarball` from the previous attempt, and upload-artifact FAILS on
           # a name collision by default — which would break the documented
           # re-run-all recovery path before it reached the publish legs at all
-          # (A-457). Overwriting is safe: the re-run rebuilds from the same
+          # (R-457). Overwriting is safe: the re-run rebuilds from the same
           # GITHUB_SHA, so the replacement is the same artefact.
           overwrite: true
 
@@ -265,7 +265,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    # Branch-restricted environment (A-326): the consumer defines `npm-release`
+    # Branch-restricted environment (R-326): the consumer defines `npm-release`
     # to permit deployments ONLY from the release branch, so a non-release ref is
     # rejected by GitHub before the OIDC token is mintable.
     environment: ${{ inputs.environment }}
@@ -273,7 +273,7 @@ jobs:
       # The npm leg's own decision (true = version bumped, not yet tagged).
       should_publish: ${{ steps.gate.outputs.publish }}
       # The GitHub Packages mirror's decision. Deliberately a SEPARATE signal —
-      # see the gate step for why it cannot reuse `should_publish` (A-457).
+      # see the gate step for why it cannot reuse `should_publish` (R-457).
       mirror_publish: ${{ steps.gate.outputs.mirror_publish }}
     permissions:
       contents: write # Git tags + GitHub releases on publish
@@ -303,7 +303,7 @@ jobs:
         # Trusted Publishing requires npm ≥11.5.1; the runner ships npm 10.x. The
         # bundled npm is broken on self-upgrade, so install via pnpm; setup-node
         # prepends its tool-cache bin AFTER pnpm/action-setup, so add PNPM_HOME to
-        # GITHUB_PATH or the bundled npm wins on PATH (A-173/174).
+        # GITHUB_PATH or the bundled npm wins on PATH (R-173/174).
         env:
           NPM_VERSION: ${{ inputs.npm-version }}
         run: |
@@ -336,7 +336,7 @@ jobs:
           fi
 
           # The GitHub Packages mirror needs its OWN signal; reusing `publish`
-          # made a mirror-only failure unrecoverable (A-457). The tag step below
+          # made a mirror-only failure unrecoverable (R-457). The tag step below
           # creates the very tag `publish` reads, so once the npm leg has gone
           # green `publish` is false for that version for ever — the mirror job
           # was then SKIPPED rather than retried, and a skip is not a failure, so
@@ -367,7 +367,7 @@ jobs:
           echo "version: $version; tag: $tag (exists: $([ "$publish" = false ] && echo yes || echo no))"
           echo "publish: $publish; mirror_publish: $mirror_publish"
 
-      # Download the exact tarball built in the unprivileged `build` job (A-328)
+      # Download the exact tarball built in the unprivileged `build` job (R-328)
       # — this job never builds from source, so no build-time code runs alongside
       # the npm OIDC credential. Only on a real release (the publish + tag steps
       # below gate on the same condition), so a no-op feature merge skips it.
@@ -395,10 +395,10 @@ jobs:
           echo "path=$tarball" >> "$GITHUB_OUTPUT"
           echo "Publishing tarball: $tarball"
 
-      # Inlined from the estate's publish-via-raw-npm.sh (A-417 centralises it so
+      # Inlined from the estate's publish-via-raw-npm.sh (R-417 centralises it so
       # consumers carry no copy). Calls npm directly (not `pnpm publish`): pnpm's
       # publish path fails OIDC Trusted Publishing even with npm 11.x on PATH
-      # (A-174). Publishes the prebuilt $TARBALL, not a re-pack. Idempotent: a
+      # (R-174). Publishes the prebuilt $TARBALL, not a re-pack. Idempotent: a
       # genuine "already published" hit exits 0; only a non-404 probe failure
       # aborts. No NPM_TOKEN — Trusted Publishing via OIDC; provenance is derived
       # from the GHA OIDC token + run context, so it works on a prebuilt tarball.
@@ -488,7 +488,7 @@ jobs:
             --notes "$notes"
           echo "Created $tag at $GITHUB_SHA."
 
-  # Secondary publish target (A-323). A SEPARATE job so `packages: write` is
+  # Secondary publish target (R-323). A SEPARATE job so `packages: write` is
   # scoped here and never granted to the `release` job. Runs only after npm
   # publish succeeds (needs: release), on its own gate + the same ref guard +
   # environment. GitHub Packages has no OIDC Trusted-Publisher flow, so this leg
@@ -496,7 +496,7 @@ jobs:
   # out-of-band by a GitHub-native attestation over the exact tarball the npm leg
   # shipped — never re-built from source.
   #
-  # The gate is `mirror_publish`, NOT `should_publish` (A-457): the npm leg's own
+  # The gate is `mirror_publish`, NOT `should_publish` (R-457): the npm leg's own
   # signal is consumed by the tag it creates, so it could never re-authorise this
   # job after a mirror-only failure. `mirror_publish` adds exactly one case —
   # a re-run of the release run itself. See the gate step for the full reasoning.
@@ -523,7 +523,7 @@ jobs:
           persist-credentials: false # Publish/attest only — never git-pushes.
 
       # GitHub Packages variant: scoped .npmrc pointing at npm.pkg.github.com. No
-      # pnpm/build step (publishes the prebuilt artifact, A-328) and no
+      # pnpm/build step (publishes the prebuilt artifact, R-328) and no
       # npm-upgrade (token auth has no npm-version floor).
       - name: 🟢 Setup Node.js (GitHub Packages)
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -556,15 +556,15 @@ jobs:
       # Decide whether this version is actually missing from GitHub Packages
       # BEFORE attesting. `mirror_publish` authorises a re-run of the release run,
       # which may replay a leg that already succeeded — attesting first would mint
-      # a throwaway Sigstore attestation on every such replay (A-457). The probe
+      # a throwaway Sigstore attestation on every such replay (R-457). The probe
       # is the cheap per-registry state check the job gate cannot express.
       #
-      # Hard-code the publish host and fail closed if the input drifts (A-330):
+      # Hard-code the publish host and fail closed if the input drifts (R-330):
       # the ephemeral GITHUB_TOKEN is sent as a bearer credential, so the host
       # must never be data-driven. Pin the registry on the query too rather than
       # leaning on the scoped .npmrc: a misconfigured scope would silently send
       # `npm view` to public npm — where the version exists — so the skip path
-      # would fire forever and GitHub Packages would go permanently stale (A-307).
+      # would fire forever and GitHub Packages would go permanently stale (R-307).
       - name: 🔎 Is this version already on GitHub Packages?
         id: probe
         working-directory: ${{ inputs.working-directory }}
@@ -588,7 +588,7 @@ jobs:
           # Tell a genuine 404 ("not published yet" → publish) apart from a
           # transient/auth failure — the latter must abort, never be mis-read as
           # "missing" and certainly never as "present" (which would leave the
-          # mirror silently stale, the very A-457 failure this gate repairs).
+          # mirror silently stale, the very R-457 failure this gate repairs).
           set +e
           view_output=$(npm view "$NAME@$VERSION" version --registry "$EXPECTED_REGISTRY" 2>&1)
           view_status=$?
@@ -612,7 +612,7 @@ jobs:
         with:
           subject-path: ${{ steps.tb.outputs.path }}
 
-      # Inlined from the estate's publish-to-github-packages.sh (A-417). Publishes
+      # Inlined from the estate's publish-to-github-packages.sh (R-417). Publishes
       # the prebuilt tarball against the same hard-coded host the probe asserted.
       # No --provenance (that targets npmjs.org's attestation API only); the
       # attestation above is the GitHub-native equivalent.

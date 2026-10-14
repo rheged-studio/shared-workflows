@@ -14,19 +14,19 @@ A single `branch` ruleset on `~DEFAULT_BRANCH` (`main`), `enforcement: active`:
   force-pushed.
 - **`pull_request`** — every change lands via a PR (so direct pushes to `main` are
   blocked), with `allowed_merge_methods` governing how. The checked-in
-  `trunk.json` allows **`["merge","squash"]`** (A-1177). Dual merge policy
-  (A-1176): **feature / ship PRs → merge commits**; **release-please version
+  `trunk.json` allows **`["merge","squash"]`** (R-1177). Dual merge policy
+  (R-1176): **feature / ship PRs → merge commits**; **release-please version
   PRs + fan-out PRs → squash**. Both repo allow-flags stay on — do not disable
   squash (orchestrator and fanout-spine need `gh pr merge --squash`).
   Approvals stay at `0`, no code-owner review (solo-maintainer, no CODEOWNERS).
 - **`required_status_checks`**, each **pinned to the GitHub Actions integration**
   (`integration_id: 15368`) so a forged commit status or a different App can't
-  satisfy them (the anti-spoof requirement, A-418):
+  satisfy them (the anti-spoof requirement, R-418):
   - **`GO/NO GO`** — the per-repo aggregator check-run (see the `GO/NO GO` gate
-    doc `docs/go-no-go-gate.md`, A-418). This is the single gate; it `needs:` every
+    doc `docs/go-no-go-gate.md`, R-418). This is the single gate; it `needs:` every
     real CI job, so requiring it transitively requires them all.
   - **`pr-title / Validate PR title is a Conventional Commit`** — the estate-pinned
-    Conventional-Commit title context (A-400/405), kept as its own required check
+    Conventional-Commit title context (R-400/405), kept as its own required check
     because it also re-runs on title edits independently of the rest of CI.
     Under merge commits the title is not the sole bump signal; the commits
     check (`commits / Validate commits are Conventional Commits`) is the
@@ -85,7 +85,7 @@ check), so it never needs swapping.
 
 A `required_status_checks` rule on a check the repo never emits leaves every PR
 `Pending` forever. **Apply this ruleset only once the repo emits a `GO/NO GO`
-check-run** (the aggregator from the gate doc `docs/go-no-go-gate.md`, A-418). For
+check-run** (the aggregator from the gate doc `docs/go-no-go-gate.md`, R-418). For
 `shared-workflows` that means after the `ci.yml` aggregator has merged to `main`.
 
 ## Per-repo apply process

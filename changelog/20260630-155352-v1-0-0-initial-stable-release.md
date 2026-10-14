@@ -5,7 +5,7 @@ version: "1.0.0"
 created_at: "2026-06-30T15:53:52Z"
 category: feature
 breaking: false
-issues: ["A-585"]
+issues: ["R-585"]
 branch: a-585-cut-shared-workflows-first-release-tag-backfill-tag-history
 merged_at: "2026-06-30T16:34:19Z"
 commit: 6cbcab6
@@ -32,7 +32,7 @@ stats:
     `reusable-build-test`, `reusable-pkg-release`.
   - **Estate gates + reference docs** — the `GO/NO GO` aggregator gate and the
     versioned canonical ruleset.
-- **Backfilled the full release history** (A-585): the `changelog/` entries and
+- **Backfilled the full release history** (R-585): the `changelog/` entries and
   the `v0.1.0`–`v0.8.0` git tags + GitHub releases were reconstructed from the
   project's merged PRs, so the tag history is complete from the first feature
   rather than truncated at adoption.

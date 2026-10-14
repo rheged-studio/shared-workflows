@@ -5,7 +5,7 @@ version: "0.3.0"
 created_at: "2026-06-26T15:19:26Z"
 category: feature
 breaking: false
-issues: ["A-415"]
+issues: ["R-415"]
 branch: sk-415-reusable-lintyml-workflow
 merged_at: "2026-06-26T15:19:26Z"
 commit: b67e60c

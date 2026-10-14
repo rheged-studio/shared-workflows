@@ -28,10 +28,10 @@ needs.
 | Action               | What it does                                                                                                                              |
 | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | `setup-project`      | pnpm + Node (from `.nvmrc`) + lockfile-keyed pnpm store cache, then install                                                               |
-| `load-repo-config`   | Allowlist-validate `infrastructure/repo-config.yaml` → step outputs (A-779); optional bot/App identity keys for changelog enrich (A-1927) |
+| `load-repo-config`   | Allowlist-validate `infrastructure/repo-config.yaml` → step outputs (R-779); optional bot/App identity keys for changelog enrich (R-1927) |
 | `eslint`             | ESLint over the repo (consumer's flat config + `@rheged-studio/eslint-config`)                                                            |
 | `lint-markdown`      | markdownlint-cli2                                                                                                                         |
-| `lint-yaml`          | yamllint (config injected from this repo, A-438) + actionlint                                                                             |
+| `lint-yaml`          | yamllint (config injected from this repo, R-438) + actionlint                                                                             |
 | `build`              | `pnpm run build` (verification build; published artefact rebuilt in release)                                                              |
 | `typecheck`          | `tsc --noEmit`                                                                                                                            |
 | `test-vitest`        | `vitest run` (unit tests)                                                                                                                 |
@@ -59,7 +59,7 @@ installer), and the runner's preinstalled ShellCheck.
   `# vX.Y.Z` comment and bumped weekly by Dependabot. Tool versions (yamllint,
   actionlint, pnpm, Node) mirror this repo's own `ci.yml` so they never drift.
 - **Permissions** — composite actions inherit the calling job's token scopes;
-  they declare none. These actions sit inside the publish trust boundary (A-422).
+  they declare none. These actions sit inside the publish trust boundary (R-422).
 
 ## Why this repo does not dogfood them via `uses:`
 
@@ -68,5 +68,5 @@ root `CLAUDE.md`), a local `uses: ./…` self-reference is not SHA-pinnable and 
 cross-repo self-reference is circular before the first tagged SHA exists. So
 `shared-workflows` authors these actions but does **not** consume them in its own
 `ci.yml`; consumers reference them cross-repo by `@<sha>`, which is compliant.
-Layer 2's `reusable-lint.yml` (A-415) and `reusable-build-test.yml` (A-416)
+Layer 2's `reusable-lint.yml` (R-415) and `reusable-build-test.yml` (R-416)
 compose them.

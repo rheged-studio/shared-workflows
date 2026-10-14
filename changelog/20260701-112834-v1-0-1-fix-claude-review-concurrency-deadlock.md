@@ -5,7 +5,7 @@ version: "1.0.1"
 created_at: "2026-07-01T11:28:34Z"
 category: fix
 breaking: false
-issues: ["A-621"]
+issues: ["R-621"]
 branch: a-621-fix-reusable-claude-review-concurrency-deadlock
 merged_at: "2026-07-01T11:28:35Z"
 commit: ff71514
@@ -49,4 +49,4 @@ stats:
 ## Consumer note
 
 Re-adopters pin the caller to the `v1.0.1` SHA (Dependabot bumps it thereafter).
-The estate-wide rollout of the fixed caller is tracked separately in A-623.
+The estate-wide rollout of the fixed caller is tracked separately in R-623.

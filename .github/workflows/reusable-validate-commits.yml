@@ -1,9 +1,9 @@
 name: Reusable / Validate commits
 
 # Reusable (workflow_call) Conventional-Commits gate over a PR's base..head
-# range (A-981 / A-823). Companion to reusable-validate-pr-title.yml.
+# range (R-981 / R-823). Companion to reusable-validate-pr-title.yml.
 #
-# Dual merge policy (A-1176 / A-1175 / A-1177): feature / ship PRs use merge
+# Dual merge policy (R-1176 / R-1175 / R-1177): feature / ship PRs use merge
 # commits, so every branch commit can land on trunk and feed release-please /
 # changelog tooling. This commitlint gate is the per-commit authority under
 # that policy — it rejects unvalidated `wip` / `fix review` subjects before
@@ -15,13 +15,13 @@ name: Reusable / Validate commits
 #
 # Ruleset: floats `@rheged-studio/commitlint-config` to latest (public npm,
 # no registry auth) so the CI gate and the local husky pre-push hook
-# (A-982) share one ruleset with zero drift. Types are intentionally NOT a
+# (R-982) share one ruleset with zero drift. Types are intentionally NOT a
 # workflow input — they live in the package. Merge / revert / fixup / squash
 # subjects rely on config-conventional's `defaultIgnores`; bot commits are
-# validated like any other (A-823 — make bot templates Conventional via A-980
+# validated like any other (R-823 — make bot templates Conventional via R-980
 # before making this a required check).
 #
-# STATUS-CHECK CONTEXT (A-400 / A-405): the job below is named
+# STATUS-CHECK CONTEXT (R-400 / R-405): the job below is named
 # `Validate commits are Conventional Commits` — the estate-canonical string a
 # single required-check rule can pin across every repo. A reusable-workflow
 # check renders as `<caller-job-id> / <job-name>`, so callers MUST use a
@@ -29,7 +29,7 @@ name: Reusable / Validate commits
 # context `commits / Validate commits are Conventional Commits`. Do NOT rename
 # either half.
 #
-# REQUIRED CALLER PERMISSIONS (A-621): a called reusable workflow's job cannot be
+# REQUIRED CALLER PERMISSIONS (R-621): a called reusable workflow's job cannot be
 # granted more than the caller's GITHUB_TOKEN holds. Under the org default
 # `default_workflow_permissions: read`, a caller with no `permissions:` block
 # hands this workflow a read-only token, the `commits` job below can't get the
@@ -91,7 +91,7 @@ jobs:
       - name: 📥 Install commitlint (float latest)
         # Ephemeral prefix — never mutates the consumer's tree / lockfile.
         # Floats both packages to latest so a ruleset publish takes effect on
-        # the next CI run with no per-repo bump PR (A-823 version strategy).
+        # the next CI run with no per-repo bump PR (R-823 version strategy).
         run: |
           set -euo pipefail
           GATE_DIR="${RUNNER_TEMP}/commitlint-gate"
