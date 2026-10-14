@@ -2,10 +2,10 @@
 title: Drop the legacy A key from the skill configs
 release_note: ""
 created_at: "2026-10-14T13:00:23Z"
-merged_at: ""
+merged_at: "2026-10-14T13:05:49Z"
 branch: r-2741-shared-workflows-drop-the-legacy-a-key
-pr: ""
-commit: ""
+pr: 135
+commit: 5487dc7
 author: rob@rheged.studio
 co_authors: []
 category: chore
@@ -13,9 +13,9 @@ breaking: false
 issues:
   - R-2741
 stats:
-  files_changed: 0
-  loc_added: 0
-  loc_removed: 0
+  files_changed: 9
+  loc_added: 36
+  loc_removed: 8
   commits: 0
 version: ""
 ---
