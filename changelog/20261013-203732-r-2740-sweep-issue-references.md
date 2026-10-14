@@ -2,10 +2,10 @@
 title: Sweep Linear issue references to R and C keys
 release_note: ""
 created_at: "2026-10-13T20:37:32Z"
-merged_at: ""
+merged_at: "2026-10-14T08:07:08Z"
 branch: r-2740-shared-workflows-sweep-issue-references
-pr:
-commit:
+pr: 133
+commit: "1975846"
 author: rob@rheged.studio
 co_authors: []
 category: chore
@@ -14,9 +14,9 @@ issues:
   - R-2740
 affected_packages: []
 stats:
-  files_changed:
-  loc_added:
-  loc_removed:
+  files_changed: 98
+  loc_added: 603
+  loc_removed: 574
   commits:
 ---
 
