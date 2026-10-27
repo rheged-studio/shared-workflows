@@ -131,6 +131,66 @@ jobs:
           use_sticky_comment: true
           claude_args: '--allowedTools "mcp__github_inline_comment__create_inline_comment,mcp__github_comment__update_claude_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"'
 
+      - name: 🔎 Report refused tool calls (R-2536)
+        # Kept in sync with the same step in reusable-claude-code-review.yml —
+        # see that file for the full rationale. In short: a refused tool call
+        # leaves the run `success` with only a count, so this names the refused
+        # tools (and Bash commands' first words) from the execution log, on
+        # success as well as failure. It never fails the job.
+        if: ${{ !cancelled() && (steps.claude-review.conclusion == 'success' || steps.claude-review.conclusion == 'failure') }}
+        env:
+          EXECUTION_FILE: ${{ steps.claude-review.outputs.execution_file }}
+        run: |
+          set -uo pipefail
+          file="${EXECUTION_FILE:-}"
+          [ -n "$file" ] || file="${RUNNER_TEMP}/claude-execution-output.json"
+
+          if [ ! -f "$file" ]; then
+            echo "No Claude execution log at '${file}'; nothing to report."
+            exit 0
+          fi
+
+          if ! denials=$(jq -r '
+            (if type == "array" then . else [.] end)
+            | map(select(type == "object" and .type == "result"))
+            | last
+            | (if . == null then [] else (.permission_denials // []) end)
+            | map(
+                if .tool_name == "Bash" then
+                  ((.tool_input.command // "") | tostring | (split("\n")[0] // "")
+                    | [splits("\\s+") | select(length > 0)]
+                    | until((.[0] // "") | test("^[A-Za-z_][A-Za-z0-9_]*=") | not; .[1:])
+                    | .[0:(if .[0] == "gh" then 3 else 2 end)]
+                    | map(if test("=") then (split("=")[0] + "=…") else . end)
+                    | join(" ")) as $prefix
+                  | "Bash(\($prefix))"
+                else
+                  (.tool_name // "unknown") | tostring
+                end
+                | .[0:80])
+            | group_by(.)
+            | sort_by(-length)
+            | map("\(length)× \(.[0])")
+            | .[0:30]
+            | .[]
+          ' "$file" 2>/dev/null); then
+            echo "::warning::Claude execution log at '${file}' was unparseable JSON (R-2536)."
+            exit 0
+          fi
+
+          if [ -z "$denials" ]; then
+            echo "No tool calls were refused."
+            exit 0
+          fi
+
+          echo "::group::Refused tool calls"
+          printf '%s\n' "$denials"
+          echo "::endgroup::"
+
+          # Escape `%` FIRST, then CR, then fold LF — see the reusable for why.
+          printf '::warning title=Claude review refused tool calls::%s\n' \
+            "$(printf '%s' "$denials" | awk 'BEGIN{ORS="%0A"} { gsub(/%/, "%25"); gsub(/\r/, "%0D"); print }')"
+
       - name: 🔎 Surface the Claude failure (R-1105)
         # Kept in sync with the same step in reusable-claude-code-review.yml —
         # see that file for the full rationale. In short: the step above runs the
