@@ -31,8 +31,9 @@ version: ""
   `permission_denials_count`, so until now there was no way to tell which
   tools to allow.
 - For Bash it prints only the command's first words (three for `gh`, two
-  otherwise), drops leading `VAR=value` assignments and masks any other value,
-  so no full command line, prompt or diff reaches the log. It runs on success
+  otherwise), drops leading `VAR=value` assignments, quoted or not, and shows
+  any word that isn't a plain token as `…`, so no full command line, value,
+  prompt or diff reaches the log. It runs on success
   and failure, and never fails the job.
 
 ## Fixed
