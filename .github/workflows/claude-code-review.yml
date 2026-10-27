@@ -163,10 +163,10 @@ jobs:
             | map(
                 if .tool_name == "Bash" then
                   ((.tool_input.command // "") | tostring | (split("\n")[0] // "")
+                    | sub("^\\s*(?:[A-Za-z_][A-Za-z0-9_]*=(?:\"[^\"]*\"|\u0027[^\u0027]*\u0027|\\S*)\\s+)*"; "")
                     | [splits("\\s+") | select(length > 0)]
-                    | until((.[0] // "") | test("^[A-Za-z_][A-Za-z0-9_]*=") | not; .[1:])
                     | .[0:(if .[0] == "gh" then 3 else 2 end)]
-                    | map(if test("=") then (split("=")[0] + "=…") else . end)
+                    | map(if test("^[A-Za-z0-9._/:@+-]+$") then . else "…" end)
                     | join(" ")) as $prefix
                   | "Bash(\($prefix))"
                 else

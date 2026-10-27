@@ -204,9 +204,10 @@ jobs:
         # The result record's `permission_denials` holds each refused call's
         # `tool_name` and `tool_input`. Only the tool name is echoed, and for
         # Bash the command's first words (three for `gh`, two otherwise, with
-        # leading `VAR=value` assignments dropped and any other `=` value
-        # masked): enough to write an --allowedTools pattern, never a full
-        # command line, the prompt or the diff. It never fails the job.
+        # leading `VAR=value` assignments dropped, quoted or not, and any word
+        # that isn't a plain token shown as `…`): enough to write an
+        # --allowedTools pattern, never a full command line, a value, the prompt
+        # or the diff. It never fails the job.
         if: ${{ !cancelled() && (steps.claude-review.conclusion == 'success' || steps.claude-review.conclusion == 'failure') }}
         env:
           EXECUTION_FILE: ${{ steps.claude-review.outputs.execution_file }}
@@ -228,10 +229,10 @@ jobs:
             | map(
                 if .tool_name == "Bash" then
                   ((.tool_input.command // "") | tostring | (split("\n")[0] // "")
+                    | sub("^\\s*(?:[A-Za-z_][A-Za-z0-9_]*=(?:\"[^\"]*\"|\u0027[^\u0027]*\u0027|\\S*)\\s+)*"; "")
                     | [splits("\\s+") | select(length > 0)]
-                    | until((.[0] // "") | test("^[A-Za-z_][A-Za-z0-9_]*=") | not; .[1:])
                     | .[0:(if .[0] == "gh" then 3 else 2 end)]
-                    | map(if test("=") then (split("=")[0] + "=…") else . end)
+                    | map(if test("^[A-Za-z0-9._/:@+-]+$") then . else "…" end)
                     | join(" ")) as $prefix
                   | "Bash(\($prefix))"
                 else
