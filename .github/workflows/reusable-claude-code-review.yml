@@ -186,7 +186,81 @@ jobs:
           allowed_bots: "road-runner-bot[bot],cursor[bot]"
           track_progress: ${{ inputs.track_progress }}
           use_sticky_comment: ${{ inputs.use_sticky_comment }}
-          claude_args: '--allowedTools "mcp__github_inline_comment__create_inline_comment,mcp__github_comment__update_claude_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"'
+          # Read-only additions (R-2536): the action's own prompt tells Claude to
+          # run `git status` and `git diff origin/<base>...HEAD`, and the plugin's
+          # command declares `gh pr list`, `gh issue view`/`list` and `gh search`,
+          # but none were allowed, so every run lost a few calls to refusals. The
+          # 🔎 Report refused tool calls step below names any that remain.
+          claude_args: '--allowedTools "mcp__github_inline_comment__create_inline_comment,mcp__github_comment__update_claude_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(gh issue view:*),Bash(gh issue list:*),Bash(gh search:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git blame:*)"'
+
+      - name: 🔎 Report refused tool calls (R-2536)
+        # A tool call outside --allowedTools is refused, and the review carries
+        # on without it: the run still ends `success`, and the action prints only
+        # `permission_denials_count`. Most runs refuse a few calls (cadogan#160
+        # refused 11), and on tempest#2959 a run refused 19 and posted no
+        # review. The count alone can't say which tools to allow, so name them
+        # here, on success as well as failure.
+        #
+        # The result record's `permission_denials` holds each refused call's
+        # `tool_name` and `tool_input`. Only the tool name is echoed, and for
+        # Bash the command's first words (three for `gh`, two otherwise, with
+        # leading `VAR=value` assignments dropped, quoted or not, and any word
+        # that isn't a plain token shown as `…`): enough to write an
+        # --allowedTools pattern, never a full command line, a value, the prompt
+        # or the diff. It never fails the job.
+        if: ${{ !cancelled() && (steps.claude-review.conclusion == 'success' || steps.claude-review.conclusion == 'failure') }}
+        env:
+          EXECUTION_FILE: ${{ steps.claude-review.outputs.execution_file }}
+        run: |
+          set -uo pipefail
+          file="${EXECUTION_FILE:-}"
+          [ -n "$file" ] || file="${RUNNER_TEMP}/claude-execution-output.json"
+
+          if [ ! -f "$file" ]; then
+            echo "No Claude execution log at '${file}'; nothing to report."
+            exit 0
+          fi
+
+          if ! denials=$(jq -r '
+            (if type == "array" then . else [.] end)
+            | map(select(type == "object" and .type == "result"))
+            | last
+            | (if . == null then [] else (.permission_denials // []) end)
+            | map(
+                if .tool_name == "Bash" then
+                  ((.tool_input.command // "") | tostring | (split("\n")[0] // "")
+                    | sub("^\\s*(?:[A-Za-z_][A-Za-z0-9_]*=(?:\"(?:\\\\.|[^\"\\\\])*\"|\u0027[^\u0027]*\u0027|\\\\.|[^\\s\"\u0027\\\\])*\\s+)*"; "")
+                    | [splits("\\s+") | select(length > 0)]
+                    | .[0:(if .[0] == "gh" then 3 else 2 end)]
+                    | map(if test("^[A-Za-z0-9._/:@+-]+$") then . else "…" end)
+                    | join(" ")) as $prefix
+                  | "Bash(\($prefix))"
+                else
+                  (.tool_name // "unknown") | tostring
+                end
+                | .[0:80])
+            | group_by(.)
+            | sort_by(-length)
+            | map("\(length)× \(.[0])")
+            | .[0:30]
+            | .[]
+          ' "$file" 2>/dev/null); then
+            echo "::warning::Claude execution log at '${file}' was unparseable JSON (R-2536)."
+            exit 0
+          fi
+
+          if [ -z "$denials" ]; then
+            echo "No tool calls were refused."
+            exit 0
+          fi
+
+          echo "::group::Refused tool calls"
+          printf '%s\n' "$denials"
+          echo "::endgroup::"
+
+          # Same escaping as the failure step below: `%` first, then CR, then LF.
+          printf '::warning title=Claude review refused tool calls::%s\n' \
+            "$(printf '%s' "$denials" | awk 'BEGIN{ORS="%0A"} { gsub(/%/, "%25"); gsub(/\r/, "%0D"); print }')"
 
       - name: 🔎 Surface the Claude failure (R-1105)
         # The step above runs the SDK with `show_full_output: false` (the secure
