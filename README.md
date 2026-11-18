@@ -402,7 +402,7 @@ the job id `validate-payload` so the ruleset-pinnable context is
 `validate-payload / Validate fanned payload`.
 
 The caller stub is **repo-owned** (R-780): place it once at onboarding (copy
-below), pin `@v1` (or let Dependabot bump a SHA), and make the status context
+below), pin `@v1`, and make the status context
 required on `main`. The release-orchestrator does **not** vendor or refresh this
 file.
 
@@ -525,30 +525,10 @@ a reusable-workflow caller even under `sha_pinning_required` (the reusable-workf
 exception) — so this stays policy-compliant. Note this is the **one** place a
 floating tag is allowed: true `uses:` **actions** (including `claude-code-action`
 _inside_ the reusables) must still be SHA-pinned; that pin lives centrally in the
-reusable and Dependabot bumps it there, so consumers never see it.
+reusable and is bumped there, so consumers never see it.
 
 A future breaking release ships as `v2` and does **not** move `v1`; opt in
 deliberately by bumping your caller to `@v2`.
-
-Still add the `github-actions` ecosystem to each consumer's `.github/dependabot.yml`
-— it keeps the repo's own third-party actions current and will surface a future
-`v2`. It no longer churns the `@v1` reusable refs every release (that churn is
-exactly what the floating tag removes):
-
-```yaml
-version: 2
-updates:
-  - package-ecosystem: github-actions
-    directory: "/"
-    schedule:
-      interval: weekly
-    groups:
-      actions:
-        patterns: ["*"]
-    commit-message:
-      prefix: "ci"
-      include: scope
-```
 
 Releases here are tagged (`vX.Y.Z`) automatically by release-please (driven by
 Clacks as a `kind: deploy` target), and the floating

@@ -56,7 +56,7 @@ installer), and the runner's preinstalled ShellCheck.
   `repo-config.yaml`; here they are plain typed `with:` inputs with sensible
   defaults.
 - **Pinning** — every third-party `uses:`/installer is SHA-pinned with a
-  `# vX.Y.Z` comment and bumped weekly by Dependabot. Tool versions (yamllint,
+  `# vX.Y.Z` comment and bumped by hand in a reviewed PR. Tool versions (yamllint,
   actionlint, pnpm, Node) mirror this repo's own `ci.yml` so they never drift.
 - **Permissions** — composite actions inherit the calling job's token scopes;
   they declare none. These actions sit inside the publish trust boundary (R-422).
