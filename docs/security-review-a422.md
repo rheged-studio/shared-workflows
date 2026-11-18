@@ -177,7 +177,10 @@ per-consumer review gate**. This is the mechanism GA depends on for hands-off fl
 
 ## 7. Dependabot hygiene
 
-[`.github/dependabot.yml`](../.github/dependabot.yml) runs **weekly, grouped** updates for
+> **Update (2026-11):** Dependabot has since been switched off estate-wide and
+> `.github/dependabot.yml` removed; this section records the posture at review time.
+
+`.github/dependabot.yml` ran **weekly, grouped** updates for
 both `github-actions` and `npm`. The `github-actions` ecosystem scans every `uses:` in
 `.github/workflows/**` and `.github/actions/**`, so the SHA-pinned third-party actions
 **inside** the reusable workflows (`actions/checkout`, `anthropics/claude-code-action`,

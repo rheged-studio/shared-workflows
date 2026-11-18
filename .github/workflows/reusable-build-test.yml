@@ -52,7 +52,7 @@ name: Reusable / Build & Test
 # the REST API hides the reason (read the one-line error on the Actions UI run
 # page).
 #
-# Consume from another repo (SHA-pinned + Dependabot — see README):
+# Consume from another repo (see README):
 #
 #   permissions:
 #     contents: read

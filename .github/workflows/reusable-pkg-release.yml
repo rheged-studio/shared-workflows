@@ -69,7 +69,7 @@ name: Reusable / Package release
 # the REST API hides the reason (read the one-line error on the Actions UI run
 # page). The block is mandatory here, not merely least-privilege hygiene.
 #
-# Consume from another repo (SHA-pinned + Dependabot — see README). The caller
+# Consume from another repo (see README). The caller
 # grants the SUPERSET of the per-job permissions below:
 #
 #   name: Package release

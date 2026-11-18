@@ -12,7 +12,7 @@ repo-specific guidance follows below.
 
 Home for the Rheged Studio estate's **reusable GitHub Actions workflows**
 (`workflow_call`). One authoritative copy of each common workflow lives here;
-consumer repos keep thin caller stubs that point at it (SHA-pinned + Dependabot).
+consumer repos keep thin caller stubs that point at it (pinned to the floating `@v1` tag).
 This replaces the previous copy-paste-per-repo approach.
 
 The product is the `reusable-*.yml` files under `.github/workflows/`. Everything
@@ -30,22 +30,21 @@ and dogfood them.
 │   ├── build/ typecheck/ test-vitest/ test-bats/  #   build/test mix-ins
 │   ├── shellcheck/ changelog-validate/  #   infra/changelog mix-ins
 │   └── README.md                        #   the action catalogue + rationale
-├── workflows/
-│   ├── reusable-claude.yml              # PRODUCT: interactive @claude
-│   ├── reusable-claude-code-review.yml  # PRODUCT: PR review
-│   ├── reusable-validate-pr-title.yml   # PRODUCT: conventional PR title
-│   ├── reusable-validate-commits.yml    # PRODUCT: conventional commits (base..head, R-981)
-│   ├── reusable-lint.yml                # PRODUCT: coarse lint bundle (Layer 2)
-│   ├── reusable-build-test.yml          # PRODUCT: coarse build/test bundle (Layer 2)
-│   ├── reusable-pkg-release.yml         # PRODUCT: build-once → npm OIDC + Packages mirror (Layer 2)
-│   ├── reusable-load-repo-config.yml    # PRODUCT: load infrastructure/repo-config.yaml (Layer 2, R-779)
-│   ├── reusable-changelog-enrich.yml    # PRODUCT: post-merge changelog enrich/finalise (Layer 2, R-793)
-│   ├── reusable-validate-payload.yml    # PRODUCT: fan-out payload check (Layer 2)
-│   ├── changelog-enrich.yml             # self-host: post-merge enrich caller (R-800)
-│   ├── claude.yml                       # self-host: inline @claude on THIS repo
-│   ├── claude-code-review.yml           # self-host: inline PR review on THIS repo
-│   └── ci.yml                           # self-CI: actionlint + yamllint + markdownlint + inline PR-title + commits
-└── dependabot.yml                       # weekly grouped github-actions + npm bumps
+└── workflows/
+    ├── reusable-claude.yml              # PRODUCT: interactive @claude
+    ├── reusable-claude-code-review.yml  # PRODUCT: PR review
+    ├── reusable-validate-pr-title.yml   # PRODUCT: conventional PR title
+    ├── reusable-validate-commits.yml    # PRODUCT: conventional commits (base..head, R-981)
+    ├── reusable-lint.yml                # PRODUCT: coarse lint bundle (Layer 2)
+    ├── reusable-build-test.yml          # PRODUCT: coarse build/test bundle (Layer 2)
+    ├── reusable-pkg-release.yml         # PRODUCT: build-once → npm OIDC + Packages mirror (Layer 2)
+    ├── reusable-load-repo-config.yml    # PRODUCT: load infrastructure/repo-config.yaml (Layer 2, R-779)
+    ├── reusable-changelog-enrich.yml    # PRODUCT: post-merge changelog enrich/finalise (Layer 2, R-793)
+    ├── reusable-validate-payload.yml    # PRODUCT: fan-out payload check (Layer 2)
+    ├── changelog-enrich.yml             # self-host: post-merge enrich caller (R-800)
+    ├── claude.yml                       # self-host: inline @claude on THIS repo
+    ├── claude-code-review.yml           # self-host: inline PR review on THIS repo
+    └── ci.yml                           # self-CI: actionlint + yamllint + markdownlint + inline PR-title + commits
 ```
 
 ## How the reusable workflows work
@@ -83,7 +82,7 @@ and dogfood them.
   what populates `github.action_path` so `lint-yaml`'s `.yamllint.yml` injection
   resolves. `reusable-lint.yml` pins these to the **`v0.8.0`** tag's SHA
   (`@7f543bef1… # v0.8.0`) — the first release whose tag carries every composite
-  action; Dependabot bumps it like any other tag pin. (The full release history
+  action; bump it by hand like any other tag pin. (The full release history
   was backfilled in R-585: `v0.1.0`–`v0.8.0` plus the `v1.0.0` stable release.)
 
 ## The pkg-release workflow (`reusable-pkg-release.yml`, R-417)
@@ -233,8 +232,8 @@ rule pins across the estate. Do **not** rename either half.
 ## Pinning
 
 Third-party actions are SHA-pinned with a `# vX.Y.Z` comment (estate policy);
-Dependabot bumps them weekly (grouped). Keep the same discipline when adding or
-updating any `uses:` line.
+Dependabot is switched off estate-wide, so bump them by hand in a reviewed PR. Keep
+the same discipline when adding or updating any `uses:` line.
 
 ## Releasing this repo (R-597)
 

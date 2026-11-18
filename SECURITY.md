@@ -32,7 +32,7 @@ superseded majors.
   `pull_request_target`; anything privileged (publishing, tagging, changelog write-back) is
   **push-to-`main`** or release-triggered only.
 - **Third-party actions are SHA-pinned** to a full 40-hex commit with a `# vX.Y.Z` comment,
-  and bumped only via reviewed weekly Dependabot PRs. This is enforced **org-wide** by the
+  and bumped only via reviewed PRs. This is enforced **org-wide** by the
   `sha_pinning_required` org policy — an unpinned third-party `uses:` is rejected at
   workflow start-up, in every repo.
 - **Reusable-workflow calls float `@v1`.** Reusable-**workflow** references are tag-exempt
